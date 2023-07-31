@@ -46,6 +46,8 @@
 #include "mem/ruby/network/garnet/Router.hh"
 #include "mem/ruby/system/RubySystem.hh"
 
+// #include <iostream>
+
 namespace gem5
 {
 
@@ -386,6 +388,8 @@ GarnetNetwork::regStats()
 {
     Network::regStats();
 
+    // std::cout << "Tick check " << clockPeriod() << " - " << curCycle() << " - " << curTick() << std::endl;
+
     // Packets
     m_packets_received
         .init(m_virtual_networks)
@@ -419,6 +423,10 @@ GarnetNetwork::regStats()
         m_packet_network_latency.subname(i, csprintf("vnet-%i", i));
         m_packet_queueing_latency.subname(i, csprintf("vnet-%i", i));
     }
+
+    m_reception_rate
+        .name(name() + ".reception_rate_without_cycle");
+    m_reception_rate = sum(m_packets_received) / m_routers.size();
 
     m_avg_packet_vnet_latency
         .name(name() + ".average_packet_vnet_latency")

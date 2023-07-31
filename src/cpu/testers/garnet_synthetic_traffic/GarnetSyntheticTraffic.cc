@@ -45,6 +45,8 @@
 #include "sim/stats.hh"
 #include "sim/system.hh"
 
+#include <iostream>
+
 namespace gem5
 {
 
@@ -152,6 +154,7 @@ GarnetSyntheticTraffic::tick()
     bool sendAllowedThisCycle;
     double injRange = pow((double) 10, (double) precision);
     unsigned trySending = random_mt.random<unsigned>(0, (int) injRange);
+
     if (trySending < injRate*injRange)
         sendAllowedThisCycle = true;
     else
@@ -172,8 +175,12 @@ GarnetSyntheticTraffic::tick()
     }
 
     // Schedule wakeup
-    if (curTick() >= simCycles)
+    if (curTick() >= simCycles){
+        if(id == 0){
+            std::cout << "Completed simCycles with system cycle:" << curCycle() << std::endl;
+        }
         exitSimLoop("Network Tester completed simCycles");
+    }
     else {
         if (!tickEvent.scheduled())
             schedule(tickEvent, clockEdge(Cycles(1)));
