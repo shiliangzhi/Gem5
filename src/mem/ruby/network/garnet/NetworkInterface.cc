@@ -34,6 +34,7 @@
 
 #include <cassert>
 #include <cmath>
+
 // #include <iostream>
 
 #include "base/cast.hh"
@@ -191,15 +192,12 @@ NetworkInterface::incrementStats(flit *t_flit)
 void
 NetworkInterface::wakeup()
 {
-    // std::cout << "Tick check(NI) " << clockPeriod() << " - " << curCycle() << " - " << curTick() << std::endl;
     std::ostringstream oss;
     for (auto &oPort: outPorts) {
         oss << oPort->routerID() << "[" << oPort->printVnets() << "] ";
     }
     DPRINTF(RubyNetwork, "Network Interface %d connected to router:%s "
             "woke up. Period: %ld\n", m_id, oss.str(), clockPeriod());
-
-    // std::cout << "Network Interface " << m_id << " connected to router:" << oss.str() << " woke up. Period: " << clockPeriod() << std::endl;
 
     assert(curTick() == clockEdge());
     MsgPtr msg_ptr;

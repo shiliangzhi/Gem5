@@ -46,8 +46,6 @@
 #include "mem/ruby/network/garnet/Router.hh"
 #include "mem/ruby/system/RubySystem.hh"
 
-// #include <iostream>
-
 namespace gem5
 {
 
@@ -387,8 +385,6 @@ void
 GarnetNetwork::regStats()
 {
     Network::regStats();
-
-    // std::cout << "Tick check " << clockPeriod() << " - " << curCycle() << " - " << curTick() << std::endl;
 
     // Packets
     m_packets_received

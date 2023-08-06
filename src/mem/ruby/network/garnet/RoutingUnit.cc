@@ -37,6 +37,8 @@
 #include "mem/ruby/network/garnet/Router.hh"
 #include "mem/ruby/slicc_interface/Message.hh"
 
+#include <iostream>
+
 namespace gem5
 {
 
@@ -193,6 +195,8 @@ RoutingUnit::outportCompute(RouteInfo route, int inport,
         // any custom algorithm
         case CUSTOM_: outport =
             outportComputeCustom(route, inport, inport_dirn); break;
+        case Ring_: outport = 
+            outportComputeRing(route, inport, inport_dirn); break;
         default: outport =
             lookupRoutingTable(route.vnet, route.net_dest); break;
     }
@@ -231,7 +235,7 @@ RoutingUnit::outportComputeXY(RouteInfo route,
 
     // already checked that in outportCompute() function
     assert(!(x_hops == 0 && y_hops == 0));
-
+    
     if (x_hops > 0) {
         if (x_dirn) {
             assert(inport_dirn == "Local" || inport_dirn == "West");
@@ -268,6 +272,38 @@ RoutingUnit::outportComputeCustom(RouteInfo route,
                                  PortDirection inport_dirn)
 {
     panic("%s placeholder executed", __FUNCTION__);
+}
+
+int
+RoutingUnit::outportComputeRing(RouteInfo route,
+                                 int inport,
+                                 PortDirection inport_dirn)
+{
+    PortDirection outport_dirn = "Unknown";
+
+    int my_id = m_router->get_id();
+    int dest_id = route.dest_router;
+    int num_routers = m_router->get_net_ptr()->getNumRouters();
+    
+    int left_distance = (my_id - dest_id + num_routers) % num_routers;
+
+    if (inport_dirn == "Right") {
+        outport_dirn = "Left";
+    }
+    else if (inport_dirn == "Left") {
+        outport_dirn = "Right";
+    }
+    else if (left_distance * 2 <= num_routers) {
+        assert(inport_dirn != "Left");
+        outport_dirn = "Left";
+    }
+    else {
+        assert(inport_dirn != "Right");
+        outport_dirn = "Right";
+    }
+
+    return m_outports_dirn2idx[outport_dirn];
+
 }
 
 } // namespace garnet

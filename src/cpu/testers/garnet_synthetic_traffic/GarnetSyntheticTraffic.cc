@@ -30,6 +30,7 @@
 
 #include <cmath>
 #include <iomanip>
+#include <iostream>
 #include <set>
 #include <string>
 #include <vector>
@@ -44,8 +45,6 @@
 #include "sim/sim_events.hh"
 #include "sim/stats.hh"
 #include "sim/system.hh"
-
-#include <iostream>
 
 namespace gem5
 {
@@ -175,8 +174,8 @@ GarnetSyntheticTraffic::tick()
     }
 
     // Schedule wakeup
-    if (curTick() >= simCycles){
-        if(id == 0){
+    if (curTick() >= simCycles) {
+        if (id == 0) {
             std::cout << "Completed simCycles with system cycle:" << curCycle() << std::endl;
         }
         exitSimLoop("Network Tester completed simCycles");
