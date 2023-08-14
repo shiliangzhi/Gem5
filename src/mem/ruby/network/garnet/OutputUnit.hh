@@ -57,7 +57,7 @@ class OutputUnit : public Consumer
 {
   public:
     OutputUnit(int id, PortDirection direction, Router *router,
-               uint32_t consumerVcs);
+               uint32_t consumerVcs, bool wormhole);
     ~OutputUnit() = default;
     void set_out_link(NetworkLink *link);
     void set_credit_link(CreditLink *credit_link);
@@ -68,7 +68,9 @@ class OutputUnit : public Consumer
     void increment_credit(int out_vc);
     bool has_credit(int out_vc);
     bool has_free_vc(int vnet);
+    bool has_free_place(int vnet);
     int select_free_vc(int vnet);
+    int select_free_place_vc(int vnet);
 
     inline PortDirection get_direction() { return m_direction; }
 
@@ -96,6 +98,12 @@ class OutputUnit : public Consumer
         return (outVcState[vc].isInState(IDLE_, curTime));
     }
 
+    inline bool
+    has_free_place(int vc, Tick CurTime)
+    {
+      return (outVcState[vc].hasFreePlace(CurTime));
+    }
+
     void insert_flit(flit *t_flit);
 
     inline int
@@ -114,6 +122,8 @@ class OutputUnit : public Consumer
     int m_vc_per_vnet;
     NetworkLink *m_out_link;
     CreditLink *m_credit_link;
+
+    bool m_use_wormhole;
 
     // This is for the network link to consume
     flitBuffer outBuffer;

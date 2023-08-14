@@ -55,7 +55,7 @@ namespace garnet
 class InputUnit : public Consumer
 {
   public:
-    InputUnit(int id, PortDirection direction, Router *router);
+    InputUnit(int id, PortDirection direction, Router *router, bool wormhole);
     ~InputUnit() = default;
 
     void wakeup();
@@ -90,7 +90,14 @@ class InputUnit : public Consumer
     inline int
     get_outport(int invc)
     {
-        return virtualChannels[invc].get_outport();
+        if (m_use_wormhole) {
+            // wormhole algorithm return the first flit outport
+            flit *t_flit = virtualChannels[invc].peekTopFlit();
+            return t_flit->get_outport();
+        }
+        else {
+            return virtualChannels[invc].get_outport();
+        }
     }
 
     inline int
@@ -165,6 +172,8 @@ class InputUnit : public Consumer
     NetworkLink *m_in_link;
     CreditLink *m_credit_link;
     flitBuffer creditQueue;
+
+    bool m_use_wormhole;
 
     // Input Virtual channels
     std::vector<VirtualChannel> virtualChannels;

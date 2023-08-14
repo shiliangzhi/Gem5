@@ -70,11 +70,18 @@ GarnetNetwork::GarnetNetwork(const Params &p)
     m_buffers_per_data_vc = p.buffers_per_data_vc;
     m_buffers_per_ctrl_vc = p.buffers_per_ctrl_vc;
     m_routing_algorithm = p.routing_algorithm;
+    m_use_wormhole = p.wormhole;
     m_next_packet_id = 0;
 
     m_enable_fault_model = p.enable_fault_model;
     if (m_enable_fault_model)
         fault_model = p.fault_model;
+    
+    // If use wormhole, a virtual channel can hole 16 flits
+    if (m_use_wormhole) {
+        m_buffers_per_data_vc = 16;
+        m_buffers_per_ctrl_vc = 16;
+    }
 
     m_vnet_type.resize(m_virtual_networks);
 

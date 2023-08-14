@@ -53,6 +53,8 @@ class Ring(SimpleTopology):
                     link_id=link_count,
                     src_node=routers[i],
                     dst_node=routers[next_i],
+                    src_outport="Right",
+                    dst_inport="Left"
                 )
             )
             link_count += 1
@@ -62,6 +64,8 @@ class Ring(SimpleTopology):
                     link_id=link_count,
                     src_node=routers[next_i],
                     dst_node=routers[i],
+                    src_outport="Left",
+                    dst_inport="Right"
                 )
             )
             link_count += 1

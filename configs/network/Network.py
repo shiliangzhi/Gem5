@@ -95,7 +95,8 @@ def define_options(parser):
         help="""routing algorithm in network.
             0: weight-based table
             1: XY (for Mesh. see garnet/RoutingUnit.cc)
-            2: Custom (see garnet/RoutingUnit.cc""",
+            2: Custom (see garnet/RoutingUnit.cc
+            3: Ring""",
     )
     parser.add_argument(
         "--network-fault-model",
@@ -117,6 +118,12 @@ def define_options(parser):
         default=False,
         help="""SimpleNetwork links uses a separate physical
             channel for each virtual network""",
+    )
+    parser.add_argument(
+        "--wormhole",
+        action="store_true",
+        default=False,
+        help="Use worm hole flow control"
     )
 
 

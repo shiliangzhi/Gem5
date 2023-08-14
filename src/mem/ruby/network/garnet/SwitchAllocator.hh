@@ -82,6 +82,7 @@ class SwitchAllocator : public Consumer
   private:
     int m_num_inports, m_num_outports;
     int m_num_vcs, m_vc_per_vnet;
+    bool m_use_wormhole;
 
     double m_input_arbiter_activity, m_output_arbiter_activity;
 

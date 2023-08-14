@@ -44,9 +44,9 @@ namespace ruby
 namespace garnet
 {
 
-InputUnit::InputUnit(int id, PortDirection direction, Router *router)
+InputUnit::InputUnit(int id, PortDirection direction, Router *router, bool wormhole)
   : Consumer(router), m_router(router), m_id(id), m_direction(direction),
-    m_vc_per_vnet(m_router->get_vc_per_vnet())
+    m_vc_per_vnet(m_router->get_vc_per_vnet()), m_use_wormhole(wormhole)
 {
     const int m_num_vcs = m_router->get_num_vcs();
     m_num_buffer_reads.resize(m_num_vcs/m_vc_per_vnet);
@@ -87,23 +87,40 @@ InputUnit::wakeup()
         int vc = t_flit->get_vc();
         t_flit->increment_hops(); // for stats
 
-        if ((t_flit->get_type() == HEAD_) ||
-            (t_flit->get_type() == HEAD_TAIL_)) {
+        if (m_use_wormhole) {
+            // Wormhole algorithm only support for signal flit packet now
+            assert(t_flit->get_type() == HEAD_TAIL_);
 
-            assert(virtualChannels[vc].get_state() == IDLE_);
-            set_vc_active(vc, curTick());
+            // VC state should be activate
+            if (virtualChannels[vc].get_state() != ACTIVE_) {
+                set_vc_active(vc, curTick());
+            }
 
-            // Route computation for this vc
-            int outport = m_router->route_compute(t_flit->get_route(),
+            int outport = m_router->route_compute(t_flit->get_route(), 
                 m_id, m_direction);
 
-            // Update output port in VC
-            // All flits in this packet will use this output port
-            // The output port field in the flit is updated after it wins SA
-            grant_outport(vc, outport);
+            // Wormhole algorithm save outport information in flit
+            t_flit->set_outport(outport);
+        }
+        else{
+            if ((t_flit->get_type() == HEAD_) ||
+                (t_flit->get_type() == HEAD_TAIL_)) {
 
-        } else {
-            assert(virtualChannels[vc].get_state() == ACTIVE_);
+                assert(virtualChannels[vc].get_state() == IDLE_);
+                set_vc_active(vc, curTick());
+
+                // Route computation for this vc
+                int outport = m_router->route_compute(t_flit->get_route(),
+                    m_id, m_direction);
+
+                // Update output port in VC
+                // All flits in this packet will use this output port
+                // The output port field in the flit is updated after it wins SA
+                grant_outport(vc, outport);
+
+            } else {
+                assert(virtualChannels[vc].get_state() == ACTIVE_);
+            }
         }
 
 

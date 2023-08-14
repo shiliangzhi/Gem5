@@ -58,6 +58,13 @@ class OutVcState
     {
         return ((m_vc_state == state) && (request_time >= m_time) );
     }
+
+    inline bool
+    hasFreePlace(Tick request_time)
+    {
+        return ((m_credit_count < m_max_credit_count) && (request_time >= m_time));
+    }
+
     inline void
     setState(VC_state_type state, Tick time)
     {

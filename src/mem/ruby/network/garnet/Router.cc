@@ -53,7 +53,7 @@ Router::Router(const Params &p)
     m_virtual_networks(p.virt_nets), m_vc_per_vnet(p.vcs_per_vnet),
     m_num_vcs(m_virtual_networks * m_vc_per_vnet), m_bit_width(p.width),
     m_network_ptr(nullptr), routingUnit(this), switchAllocator(this),
-    crossbarSwitch(this)
+    crossbarSwitch(this), m_use_wormhole(p.wormhole)
 {
     m_input_unit.clear();
     m_output_unit.clear();
@@ -105,7 +105,7 @@ Router::addInPort(PortDirection inport_dirn,
             "Units.", in_link->name(), in_link->bitWidth, m_id, m_bit_width);
 
     int port_num = m_input_unit.size();
-    InputUnit *input_unit = new InputUnit(port_num, inport_dirn, this);
+    InputUnit *input_unit = new InputUnit(port_num, inport_dirn, this, m_use_wormhole);
 
     input_unit->set_in_link(in_link);
     input_unit->set_credit_link(credit_link);
@@ -130,7 +130,7 @@ Router::addOutPort(PortDirection outport_dirn,
 
     int port_num = m_output_unit.size();
     OutputUnit *output_unit = new OutputUnit(port_num, outport_dirn, this,
-                                             consumerVcs);
+                                             consumerVcs, m_use_wormhole);
 
     output_unit->set_out_link(out_link);
     output_unit->set_credit_link(credit_link);

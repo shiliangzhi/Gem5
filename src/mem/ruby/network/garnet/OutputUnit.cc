@@ -47,9 +47,9 @@ namespace garnet
 {
 
 OutputUnit::OutputUnit(int id, PortDirection direction, Router *router,
-  uint32_t consumerVcs)
+  uint32_t consumerVcs, bool wormhole)
   : Consumer(router), m_router(router), m_id(id), m_direction(direction),
-    m_vc_per_vnet(consumerVcs)
+    m_vc_per_vnet(consumerVcs), m_use_wormhole(wormhole)
 {
     const int m_num_vcs = consumerVcs * m_router->get_num_vnets();
     outVcState.reserve(m_num_vcs);
@@ -106,6 +106,20 @@ OutputUnit::has_free_vc(int vnet)
     return false;
 }
 
+// Check if output port has free flit place (only for wormhole algorithm)
+bool
+OutputUnit::has_free_place(int vnet)
+{
+    // The func only prepare for wormhole algorithm
+    assert(m_use_wormhole);
+    int vc_base = vnet * m_vc_per_vnet;
+    for (int vc = vc_base; vc < vc_base + m_vc_per_vnet; vc++) {
+        if (has_free_place(vc, curTick()))
+            return true;
+    }
+    return false;
+}
+
 // Assign a free output VC to the winner of Switch Allocation
 int
 OutputUnit::select_free_vc(int vnet)
@@ -119,6 +133,18 @@ OutputUnit::select_free_vc(int vnet)
     }
 
     return -1;
+}
+
+// Assign a output VC which have free space for Switch Allocation
+int OutputUnit::select_free_place_vc(int vnet)
+{
+    int vc_base = vnet * m_vc_per_vnet;
+    for (int vc = vc_base; vc < vc_base + m_vc_per_vnet; vc++) {
+        if (has_free_place(vc, curTick())) {
+            outVcState[vc].setState(ACTIVE_, curTick());
+            return vc;
+        }
+    }
 }
 
 /*

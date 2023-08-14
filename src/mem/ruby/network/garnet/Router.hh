@@ -89,6 +89,7 @@ class Router : public BasicRouter, public Consumer
     int get_num_inports()   { return m_input_unit.size(); }
     int get_num_outports()  { return m_output_unit.size(); }
     int get_id()            { return m_id; }
+    bool use_wormhole()     { return m_use_wormhole;}
 
     void init_net_ptr(GarnetNetwork* net_ptr)
     {
@@ -146,6 +147,7 @@ class Router : public BasicRouter, public Consumer
     Cycles m_latency;
     uint32_t m_virtual_networks, m_vc_per_vnet, m_num_vcs;
     uint32_t m_bit_width;
+    bool m_use_wormhole;
     GarnetNetwork *m_network_ptr;
 
     RoutingUnit routingUnit;

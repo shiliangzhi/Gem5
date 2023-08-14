@@ -48,6 +48,7 @@ class GarnetNetwork(RubyNetwork):
     routing_algorithm = Param.Int(0, "0: Weight-based Table, 1: XY, 2: Custom")
     enable_fault_model = Param.Bool(False, "enable network fault model")
     fault_model = Param.FaultModel(NULL, "network fault model")
+    wormhole = Param.Bool(False, "Use worm hole flow control")
     garnet_deadlock_threshold = Param.UInt32(
         50000, "network-level deadlock threshold"
     )
@@ -83,3 +84,4 @@ class GarnetRouter(BasicRouter):
     width = Param.UInt32(
         Parent.ni_flit_size, "bit width supported by the router"
     )
+    wormhole = Param.Bool(Parent.wormhole, "Use worm hole flow control")
