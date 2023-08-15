@@ -87,6 +87,12 @@ InputUnit::wakeup()
         int vc = t_flit->get_vc();
         t_flit->increment_hops(); // for stats
 
+        // puts("==========Input check==========");
+        // std::cout << "Inport id: " << m_id << std::endl;
+        // std::cout << "Inport direction: " << m_direction << std::endl;
+        // std::cout << "Flit vc: " << vc << std::endl;
+        // std::cout << "Use wormhole: " << m_use_wormhole << std::endl;
+
         if (m_use_wormhole) {
             // Wormhole algorithm only support for signal flit packet now
             assert(t_flit->get_type() == HEAD_TAIL_);
@@ -96,8 +102,10 @@ InputUnit::wakeup()
                 set_vc_active(vc, curTick());
             }
 
-            int outport = m_router->route_compute(t_flit->get_route(), 
+            int outport = m_router->route_compute(t_flit->get_route(),
                 m_id, m_direction);
+
+            // std::cout << "Outport check: " << outport << std::endl;
 
             // Wormhole algorithm save outport information in flit
             t_flit->set_outport(outport);

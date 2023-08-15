@@ -278,6 +278,7 @@ class NetworkInterface : public ClockedObject, public Consumer
     std::vector<InputPort *> inPorts;
     int m_deadlock_threshold;
     std::vector<OutVcState> outVcState;
+    bool m_use_wormhole;
 
     std::vector<int> m_stall_count;
 

@@ -119,11 +119,18 @@ SwitchAllocator::arbitrate_inports()
         for (int invc_iter = 0; invc_iter < m_num_vcs; invc_iter++) {
             auto input_unit = m_router->getInputUnit(inport);
 
+
             if (input_unit->need_stage(invc, SA_, curTick())) {
                 // This flit is in SA stage
 
+                // std::cout << "=====SwitchAlloactor check=====" << std::endl;
+                
+                // std::cout << "Use wormhole: " << m_use_wormhole << std::endl;
+
                 int outport = input_unit->get_outport(invc);
                 int outvc = input_unit->get_outvc(invc);
+
+                // std::cout << "Get outport: " << outport << std::endl;
 
                 // Since we only care signal flit packets in wormhole algorithm,
                 // we need allocate out vc every time
@@ -135,6 +142,8 @@ SwitchAllocator::arbitrate_inports()
                 // send_allowed conditions described in that function.
                 bool make_request =
                     send_allowed(inport, invc, outport, outvc);
+
+                // std::cout << "Make allowed check: " << make_request << std::endl;
 
                 if (make_request) {
                     m_input_arbiter_activity++;
@@ -208,9 +217,9 @@ SwitchAllocator::arbitrate_outports()
                             *t_flit,
                         m_router->curCycle());
 
-                
+
                 if(m_use_wormhole) {
-                    // If use wormhole, the outport information will 
+                    // If use wormhole, the outport information will
                     // save in flit, so outport information must already
                     // in flit
                     assert(t_flit->get_outport() == outport);
@@ -235,7 +244,7 @@ SwitchAllocator::arbitrate_outports()
                 t_flit->advance_stage(ST_, curTick());
                 m_router->grant_switch(inport, t_flit);
                 m_output_arbiter_activity++;
-                
+
                 if (m_use_wormhole) {
                     // Wormhole algorithm never free VC
                     input_unit->increment_credit(invc, false, curTick());
@@ -311,6 +320,13 @@ SwitchAllocator::send_allowed(int inport, int invc, int outport, int outvc)
     int vnet = get_vnet(invc);
     bool has_outvc = (outvc != -1);
     bool has_credit = false;
+
+    // std::cout << "=======SendAllowed check=======" << std::endl;
+
+    // std::cout << "Inport: " << inport << std::endl;
+    // std::cout << "In vc: " << invc << std::endl;
+    // std::cout << "Outport: " << outport << std::endl;
+    // std::cout << "Out vc: " << outvc << std::endl;
 
     auto output_unit = m_router->getOutputUnit(outport);
     if (!has_outvc) {

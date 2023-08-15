@@ -35,8 +35,6 @@
 #include <cassert>
 #include <cmath>
 
-// #include <iostream>
-
 #include "base/cast.hh"
 #include "debug/RubyNetwork.hh"
 #include "mem/ruby/network/MessageBuffer.hh"
@@ -58,7 +56,8 @@ NetworkInterface::NetworkInterface(const Params &p)
     m_virtual_networks(p.virt_nets), m_vc_per_vnet(0),
     m_vc_allocator(m_virtual_networks, 0),
     m_deadlock_threshold(p.garnet_deadlock_threshold),
-    vc_busy_counter(m_virtual_networks, 0)
+    vc_busy_counter(m_virtual_networks, 0),
+    m_use_wormhole(p.wormhole)
 {
     m_stall_count.resize(m_virtual_networks);
     niOutVcs.resize(0);
@@ -224,6 +223,8 @@ NetworkInterface::wakeup()
     // Check if there are flits stalling a virtual channel. Track if a
     // message is enqueued to restrict ejection to one message per cycle.
     checkStallQueue();
+
+    // std::cout << "Check NI: " << inPorts.size() << std::endl;
 
     /*********** Check the incoming flit link **********/
     DPRINTF(RubyNetwork, "Number of input ports: %d\n", inPorts.size());
@@ -467,10 +468,19 @@ NetworkInterface::calculateVC(int vnet)
         if (m_vc_allocator[vnet] == m_vc_per_vnet)
             m_vc_allocator[vnet] = 0;
 
-        if (outVcState[(vnet*m_vc_per_vnet) + delta].isInState(
-                    IDLE_, curTick())) {
-            vc_busy_counter[vnet] = 0;
-            return ((vnet*m_vc_per_vnet) + delta);
+        if (m_use_wormhole) {
+            // If use wromhole, we check free place rather than idle
+            if (outVcState[(vnet * m_vc_per_vnet) + delta].hasFreePlace(curTick())) {
+                vc_busy_counter[vnet] = 0;
+                return ((vnet*m_vc_per_vnet) + delta);
+            }
+        }
+        else {
+            if (outVcState[(vnet*m_vc_per_vnet) + delta].isInState(
+                        IDLE_, curTick())) {
+                vc_busy_counter[vnet] = 0;
+                return ((vnet*m_vc_per_vnet) + delta);
+            }
         }
     }
 

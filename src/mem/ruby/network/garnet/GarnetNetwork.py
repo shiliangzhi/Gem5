@@ -69,6 +69,7 @@ class GarnetNetworkInterface(ClockedObject):
     garnet_deadlock_threshold = Param.UInt32(
         Parent.garnet_deadlock_threshold, "network-level deadlock threshold"
     )
+    wormhole = Param.Bool(Parent.wormhole, "Use worm hole flow control")
 
 
 class GarnetRouter(BasicRouter):

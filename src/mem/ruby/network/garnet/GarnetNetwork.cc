@@ -76,7 +76,7 @@ GarnetNetwork::GarnetNetwork(const Params &p)
     m_enable_fault_model = p.enable_fault_model;
     if (m_enable_fault_model)
         fault_model = p.fault_model;
-    
+
     // If use wormhole, a virtual channel can hole 16 flits
     if (m_use_wormhole) {
         m_buffers_per_data_vc = 16;
