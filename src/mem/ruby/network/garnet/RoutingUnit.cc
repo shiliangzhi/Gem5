@@ -274,6 +274,12 @@ RoutingUnit::outportComputeCustom(RouteInfo route,
     panic("%s placeholder executed", __FUNCTION__);
 }
 
+
+// Routing algorithm for Ring
+// To prevent deadlock, we use set weight 2 for link between 
+// router 0 and num - 1, other with weight 1
+// Every path should eigher end with weight 2 or never go
+// through weight 2
 int
 RoutingUnit::outportComputeRing(RouteInfo route,
                                  int inport,
@@ -294,12 +300,18 @@ RoutingUnit::outportComputeRing(RouteInfo route,
         outport_dirn = "Right";
     }
     else if (left_distance * 2 <= num_routers) {
-        assert(inport_dirn != "Left");
-        outport_dirn = "Left";
+        // prefer go to left
+        if (dest_id < my_id || dest_id == num_routers - 1) {
+            outport_dirn = "Left";
+        }
+        else outport_dirn = "Right";
     }
     else {
-        assert(inport_dirn != "Right");
-        outport_dirn = "Right";
+        // prefer go to right
+        if (dest_id > my_id || dest_id == 0) {
+            outport_dirn = "Right";
+        }
+        else outport_dirn = "Left";
     }
 
     return m_outports_dirn2idx[outport_dirn];

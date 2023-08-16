@@ -114,10 +114,6 @@ OutputUnit::has_free_place(int vnet)
     assert(m_use_wormhole);
     int vc_base = vnet * m_vc_per_vnet;
     for (int vc = vc_base; vc < vc_base + m_vc_per_vnet; vc++) {
-        // std::cout << "Has free place in vc " << vc << " ? " << std::endl;
-        // std::cout << "Max credict: " << outVcState[vc].get_max_credit_count() << std::endl;
-        // std::cout << "Now credict: " << outVcState[vc].get_credit_count() << std::endl;
-        // std::cout << "Has free palce: " << has_free_place(vc, curTick()) << std::endl;
         if (has_free_place(vc, curTick()))
             return true;
     }

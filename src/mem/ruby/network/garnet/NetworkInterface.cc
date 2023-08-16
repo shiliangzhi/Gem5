@@ -224,8 +224,6 @@ NetworkInterface::wakeup()
     // message is enqueued to restrict ejection to one message per cycle.
     checkStallQueue();
 
-    // std::cout << "Check NI: " << inPorts.size() << std::endl;
-
     /*********** Check the incoming flit link **********/
     DPRINTF(RubyNetwork, "Number of input ports: %d\n", inPorts.size());
     for (auto &iPort: inPorts) {
