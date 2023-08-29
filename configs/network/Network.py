@@ -96,7 +96,9 @@ def define_options(parser):
             0: weight-based table
             1: XY (for Mesh. see garnet/RoutingUnit.cc)
             2: Custom (see garnet/RoutingUnit.cc
-            3: Ring""",
+            3: Ring
+            4: Torus2DD
+            5: Torus3DD""",
     )
     parser.add_argument(
         "--network-fault-model",

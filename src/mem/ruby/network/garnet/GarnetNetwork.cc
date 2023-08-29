@@ -73,6 +73,10 @@ GarnetNetwork::GarnetNetwork(const Params &p)
     m_use_wormhole = p.wormhole;
     m_next_packet_id = 0;
 
+    m_x_length = p.x_length;
+    m_y_length = p.y_length;
+    m_z_length = p.z_length;
+
     m_enable_fault_model = p.enable_fault_model;
     if (m_enable_fault_model)
         fault_model = p.fault_model;
