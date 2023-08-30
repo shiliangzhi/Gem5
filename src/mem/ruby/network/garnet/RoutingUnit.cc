@@ -195,7 +195,7 @@ RoutingUnit::outportCompute(RouteInfo route, int inport,
         // any custom algorithm
         case CUSTOM_: outport =
             outportComputeCustom(route, inport, inport_dirn); break;
-        case Ring_: outport = 
+        case Ring_: outport =
             outportComputeRing(route, inport, inport_dirn); break;
         default: outport =
             lookupRoutingTable(route.vnet, route.net_dest); break;
@@ -235,7 +235,7 @@ RoutingUnit::outportComputeXY(RouteInfo route,
 
     // already checked that in outportCompute() function
     assert(!(x_hops == 0 && y_hops == 0));
-    
+
     if (x_hops > 0) {
         if (x_dirn) {
             assert(inport_dirn == "Local" || inport_dirn == "West");
@@ -276,7 +276,7 @@ RoutingUnit::outportComputeCustom(RouteInfo route,
 
 
 // Routing algorithm for Ring
-// To prevent deadlock, we use set weight 2 for link between 
+// To prevent deadlock, we use set weight 2 for link between
 // router 0 and num - 1, other with weight 1
 // Every path should eigher end with weight 2 or never go
 // through weight 2
@@ -290,7 +290,7 @@ RoutingUnit::outportComputeRing(RouteInfo route,
     int my_id = m_router->get_id();
     int dest_id = route.dest_router;
     int num_routers = m_router->get_net_ptr()->getNumRouters();
-    
+
     int left_distance = (my_id - dest_id + num_routers) % num_routers;
 
     if (inport_dirn == "Right") {
