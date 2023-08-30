@@ -48,6 +48,12 @@ def define_options(parser):
         help="the number of rows in the mesh topology",
     )
     parser.add_argument(
+        "--torus-cols",
+        type=int,
+        default=0,
+        help="the number of columns in 3D or higher dim topology",
+    )
+    parser.add_argument(
         "--network",
         default="simple",
         choices=["simple", "garnet"],
@@ -96,7 +102,9 @@ def define_options(parser):
             0: weight-based table
             1: XY (for Mesh. see garnet/RoutingUnit.cc)
             2: Custom (see garnet/RoutingUnit.cc
-            3: Ring""",
+            3: Ring
+            4: Torus2DD
+            5: Torus3DD""",
     )
     parser.add_argument(
         "--network-fault-model",

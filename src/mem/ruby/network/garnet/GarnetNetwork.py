@@ -49,6 +49,9 @@ class GarnetNetwork(RubyNetwork):
     enable_fault_model = Param.Bool(False, "enable network fault model")
     fault_model = Param.FaultModel(NULL, "network fault model")
     wormhole = Param.Bool(False, "Use worm hole flow control")
+    x_length = Param.Int(0, "x dimension of the mesh/torus")
+    y_length = Param.Int(0, "y dimension of the mesh/torus")
+    z_length = Param.Int(0, "z dimension of the mesh/torus")
     garnet_deadlock_threshold = Param.UInt32(
         50000, "network-level deadlock threshold"
     )
