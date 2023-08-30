@@ -52,6 +52,7 @@ class GarnetNetwork(RubyNetwork):
     x_length = Param.Int(0, "x dimension of the mesh/torus")
     y_length = Param.Int(0, "y dimension of the mesh/torus")
     z_length = Param.Int(0, "z dimension of the mesh/torus")
+    espace_algorithm = Param.Int(0, "Espace VC algorithm")
     garnet_deadlock_threshold = Param.UInt32(
         50000, "network-level deadlock threshold"
     )

@@ -55,7 +55,8 @@ class RoutingUnit
     RoutingUnit(Router *router);
     int outportCompute(RouteInfo route,
                       int inport,
-                      PortDirection inport_dirn);
+                      PortDirection inport_dirn,
+                      bool get_espace=false);
 
     // Topology-agnostic Routing Table based routing (default)
     void addRoute(std::vector<NetDest>& routing_table_entry);
@@ -83,6 +84,8 @@ class RoutingUnit
                            int inport,
                            PortDirection inport_dirn);
 
+    // Deterministic routing algorithm with deadlock free
+    // If we use espace vc, base algorithm is these
     int outportComputeTorus2DDeteministic(RouteInfo route,
                                           int inport,
                                           PortDirection inport_dirn);
@@ -90,6 +93,15 @@ class RoutingUnit
     int outportComputeTorus3DDeteministic(RouteInfo route,
                                           int inport,
                                           PortDirection inport_dirn);
+
+    // Deterministic routing algorithm, but not guarantee deadlock free
+    int outportComputeTorus2DShortXY(RouteInfo route,
+                                     int inport,
+                                     PortDirection inport_dirn);
+    
+    int outportComputeTorus3DShortXY(RouteInfo route,
+                                     int inport,
+                                     PortDirection inport_dirn);
 
     // Returns true if vnet is present in the vector
     // of vnets or if the vector supports all vnets.

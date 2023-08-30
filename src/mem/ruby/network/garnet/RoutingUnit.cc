@@ -169,7 +169,8 @@ RoutingUnit::addOutDirection(PortDirection outport_dirn, int outport_idx)
 
 int
 RoutingUnit::outportCompute(RouteInfo route, int inport,
-                            PortDirection inport_dirn)
+                            PortDirection inport_dirn, 
+                            bool get_espace)
 {
     int outport = -1;
 
@@ -197,10 +198,28 @@ RoutingUnit::outportCompute(RouteInfo route, int inport,
             outportComputeCustom(route, inport, inport_dirn); break;
         case Ring_: outport =
             outportComputeRing(route, inport, inport_dirn); break;
-        case Torus2DD_: outport = 
+        case Torus2DD_: outport =
             outportComputeTorus2DDeteministic(route, inport, inport_dirn); break;
         case Torus3DD_: outport =
             outportComputeTorus3DDeteministic(route, inport, inport_dirn); break;
+        case ShortXY:
+            if (get_espace) {
+                outport = 
+                outportComputeTorus2DDeteministic(route, inport, inport_dirn); break;
+            }
+            else {
+                outport = 
+                outportComputeTorus2DShortXY(route, inport, inport_dirn); break;
+            }
+        case ShortXYZ:
+            if (get_espace) {
+                outport =
+                outportComputeTorus3DDeteministic(route, inport, inport_dirn); break;
+            }
+            else {
+                outport = 
+                outportComputeTorus3DShortXY(route, inport, inport_dirn); break;
+            }
         default: outport =
             lookupRoutingTable(route.vnet, route.net_dest); break;
     }
@@ -322,15 +341,15 @@ RoutingUnit::outportComputeRing(RouteInfo route,
 
 }
 
-int 
-RoutingUnit::outportComputeTorus2DDeteministic(RouteInfo route, 
-                                                int inport, 
+int
+RoutingUnit::outportComputeTorus2DDeteministic(RouteInfo route,
+                                                int inport,
                                                 PortDirection inport_dirn)
 {
     PortDirection outport_dirn = "Unknown";
     int my_id = m_router->get_id();
     int dest_id = route.dest_router;
-    
+
     int x_length = m_router->get_net_ptr()->getXLength();
     int y_length = m_router->get_net_ptr()->getYLength();
 
@@ -383,8 +402,8 @@ RoutingUnit::outportComputeTorus2DDeteministic(RouteInfo route,
 }
 
 int
-RoutingUnit::outportComputeTorus3DDeteministic(RouteInfo route, 
-                                                int inport, 
+RoutingUnit::outportComputeTorus3DDeteministic(RouteInfo route,
+                                                int inport,
                                                 PortDirection inport_dirn)
 {
     PortDirection outport_dirn = "Unknown";
@@ -456,6 +475,105 @@ RoutingUnit::outportComputeTorus3DDeteministic(RouteInfo route,
                 outport_dirn = "Up";
             }
             else outport_dirn = "Down";
+        }
+        return m_outports_dirn2idx[outport_dirn];
+    }
+}
+
+int 
+RoutingUnit::outportComputeTorus2DShortXY(RouteInfo route,
+                                         int inport,
+                                         PortDirection inport_dirn)
+{
+    PortDirection outport_dirn = "Unknown";
+    int my_id = m_router->get_id();
+    int dest_id = route.dest_router;
+
+    int x_length = m_router->get_net_ptr()->getXLength();
+    int y_length = m_router->get_net_ptr()->getYLength();
+
+
+    int my_x = my_id % x_length;
+    int my_y = my_id / x_length;
+
+    int dest_x = dest_id % x_length;
+    int dest_y = dest_id / x_length;
+
+    if (dest_x != my_x){
+        int left_distance = (my_x - dest_x + x_length) % x_length;
+        if (left_distance * 2 <= x_length) {
+            outport_dirn = "West";
+        }
+        else {
+            outport_dirn = "East";
+        }
+
+        return m_outports_dirn2idx[outport_dirn];
+    }
+
+    if (dest_y != my_y) {
+        int left_distance = (my_y - dest_y + y_length) % y_length;
+        if (left_distance * 2 <= y_length) {
+            outport_dirn = "South";
+        }
+        else {
+            outport_dirn = "North";
+        }
+
+        return m_outports_dirn2idx[outport_dirn];
+    }
+}
+
+int 
+RoutingUnit::outportComputeTorus3DShortXY(RouteInfo route,
+                                         int inport,
+                                         PortDirection inport_dirn)
+{
+    PortDirection outport_dirn = "Unknown";
+    int my_id = m_router->get_id();
+    int dest_id = route.dest_router;
+
+    int x_length = m_router->get_net_ptr()->getXLength();
+    int y_length = m_router->get_net_ptr()->getYLength();
+    int z_length = m_router->get_net_ptr()->getZLength();
+
+    int my_x = my_id % x_length;
+    int my_y = (my_id / x_length) % y_length;
+    int my_z = my_id / (x_length * y_length);
+
+    int dest_x = dest_id % x_length;
+    int dest_y = (dest_id / x_length) % y_length;
+    int dest_z = dest_id / (x_length * y_length);
+
+    if (dest_x != my_x){
+        int left_distance = (my_x - dest_x + x_length) % x_length;
+        if (left_distance * 2 <= x_length) {
+            outport_dirn = "West";
+        }
+        else {
+            outport_dirn = "East";
+        }
+        return m_outports_dirn2idx[outport_dirn];
+    }
+
+    if (dest_y != my_y) {
+        int left_distance = (my_y - dest_y + y_length) % y_length;
+        if (left_distance * 2 <= y_length) {
+            outport_dirn = "South";
+        }
+        else {
+            outport_dirn = "North";
+        }
+        return m_outports_dirn2idx[outport_dirn];
+    }
+
+    if (dest_z != my_z) {
+        int left_distance = (my_z - dest_z + z_length) % z_length;
+        if (left_distance * 2 <= z_length) {
+            outport_dirn = "Down";
+        }
+        else {
+            outport_dirn = "Up";
         }
         return m_outports_dirn2idx[outport_dirn];
     }

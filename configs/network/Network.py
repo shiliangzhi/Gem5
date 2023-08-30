@@ -104,7 +104,19 @@ def define_options(parser):
             2: Custom (see garnet/RoutingUnit.cc
             3: Ring
             4: Torus2DD
-            5: Torus3DD""",
+            5: Torus3DD
+            6: ShortXY(For torus 2D)
+            7: ShortXYZ(For torus 3D)""",
+    )
+    parser.add_argument(
+        "--espace-algorithm",
+        action="store",
+        type=int,
+        default=0,
+        help="""Espace VC algorithm.
+        0: Not espace vc.
+        1: Have espace, simple algorithm(If not free for all common vc, 
+        switch to esapce vc)"""
     )
     parser.add_argument(
         "--network-fault-model",

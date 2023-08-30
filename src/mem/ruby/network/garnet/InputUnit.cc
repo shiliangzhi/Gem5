@@ -117,14 +117,36 @@ InputUnit::wakeup()
                 assert(virtualChannels[vc].get_state() == IDLE_);
                 set_vc_active(vc, curTick());
 
-                // Route computation for this vc
-                int outport = m_router->route_compute(t_flit->get_route(),
-                    m_id, m_direction);
+                EspaceAlgorithm espace_algorithm = (EspaceAlgorithm) m_router ->
+                                                   get_net_ptr()->getEspaceAlgorithm();
+                
+                if (espace_algorithm == SIMPLE_) {
+                    // First order
+                    int outport = m_router->route_compute(t_flit->get_route(),
+                        m_id, m_direction);
+                    int espace_outport = m_router->route_compute(t_flit->get_route(),
+                        m_id, m_direction, true);
+                    grant_outport(vc, outport);
 
-                // Update output port in VC
-                // All flits in this packet will use this output port
-                // The output port field in the flit is updated after it wins SA
-                grant_outport(vc, outport);
+                    t_flit->set_common_outport(outport);
+                    t_flit->set_espace_outport(espace_outport);
+
+                    // Check if we should only use espace vc
+                    if (t_flit->get_state() == 1){
+                        grant_outport(vc, espace_outport);
+                    }
+
+                }
+                else {
+                    // Route computation for this vc
+                    int outport = m_router->route_compute(t_flit->get_route(),
+                        m_id, m_direction);
+
+                    // Update output port in VC
+                    // All flits in this packet will use this output port
+                    // The output port field in the flit is updated after it wins SA
+                    grant_outport(vc, outport);
+                }
 
             } else {
                 assert(virtualChannels[vc].get_state() == ACTIVE_);

@@ -65,6 +65,9 @@ class flit
     Tick get_time() { return m_time; }
     int get_vnet() { return m_vnet; }
     int get_vc() { return m_vc; }
+    int get_common_outport() {return m_common_outport;}
+    int get_espace_outport() {return m_espace_outport;}
+    int get_state() {return m_state;}
     RouteInfo get_route() { return m_route; }
     MsgPtr& get_msg_ptr() { return m_msg_ptr; }
     flit_type get_type() { return m_type; }
@@ -78,6 +81,9 @@ class flit
     void set_src_delay(Tick delay) { src_delay = delay; }
     void set_dequeue_time(Tick time) { m_dequeue_time = time; }
     void set_enqueue_time(Tick time) { m_enqueue_time = time; }
+    void set_common_outport(int outport) { m_common_outport = outport; }
+    void set_espace_outport(int outport) { m_espace_outport = outport;}
+    void set_state(int state) { m_state = state; }
 
     void increment_hops() { m_route.hops_traversed++; }
     virtual void print(std::ostream& out) const;
@@ -120,6 +126,10 @@ class flit
     int m_id;
     int m_vnet;
     int m_vc;
+
+    int m_state; // 0: in common vc, 1: in espace vc
+    int m_common_outport, m_espace_outport;
+
     RouteInfo m_route;
     int m_size;
     Tick m_enqueue_time, m_dequeue_time;
