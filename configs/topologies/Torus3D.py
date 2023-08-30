@@ -21,12 +21,18 @@ class Torus3D(SimpleTopology):
 
 		num_routers = options.num_cpus
 		
-		x_length = options.x_length
-		y_length = options.y_length
-		z_length = options.z_length
+		x_length = options.mesh_rows
+		y_length = options.torus_cols
 
+		assert x_length != 0 and y_length != 0, "In 3D dim topology, row number and column number can't be 0"
+
+		z_length = int(num_routers / x_length / y_length)
 
 		assert x_length * y_length * z_length == num_routers, "x_length * y_length * z_length must equal num_routers"
+
+		network.x_length = x_length
+		network.y_length = y_length
+		network.z_length = z_length
 
 		link_latency = options.link_latency
 		router_latency = options.router_latency

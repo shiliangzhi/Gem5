@@ -334,6 +334,7 @@ RoutingUnit::outportComputeTorus2DDeteministic(RouteInfo route,
     int x_length = m_router->get_net_ptr()->getXLength();
     int y_length = m_router->get_net_ptr()->getYLength();
 
+
     int my_x = my_id % x_length;
     int my_y = my_id / x_length;
 
@@ -341,7 +342,7 @@ RoutingUnit::outportComputeTorus2DDeteministic(RouteInfo route,
     int dest_y = dest_id / x_length;
 
     if (dest_x != my_x){
-        left_distance = (my_x - dest_x + x_length) % x_length;
+        int left_distance = (my_x - dest_x + x_length) % x_length;
         if (left_distance * 2 <= x_length) {
             // prefer go to left
             if (dest_x < my_x || dest_x == x_length - 1) {
@@ -352,15 +353,16 @@ RoutingUnit::outportComputeTorus2DDeteministic(RouteInfo route,
         else {
             // prefer go to right
             if (dest_x > my_x || dest_x == 0) {
-                outport_dirn = "Right";
+                outport_dirn = "East";
             }
-            else outport_dirn = "Left";
+            else outport_dirn = "West";
         }
+
         return m_outports_dirn2idx[outport_dirn];
     }
 
     if (dest_y != my_y) {
-        left_distance = (my_y - dest_y + y_length) % y_length;
+        int left_distance = (my_y - dest_y + y_length) % y_length;
         if (left_distance * 2 <= y_length) {
             // prefer go to left
             if (dest_y < my_y || dest_y == y_length - 1) {
@@ -375,6 +377,7 @@ RoutingUnit::outportComputeTorus2DDeteministic(RouteInfo route,
             }
             else outport_dirn = "South";
         }
+
         return m_outports_dirn2idx[outport_dirn];
     }
 }
@@ -401,7 +404,7 @@ RoutingUnit::outportComputeTorus3DDeteministic(RouteInfo route,
     int dest_z = dest_id / (x_length * y_length);
 
     if (dest_x != my_x){
-        left_distance = (my_x - dest_x + x_length) % x_length;
+        int left_distance = (my_x - dest_x + x_length) % x_length;
         if (left_distance * 2 <= x_length) {
             // prefer go to left
             if (dest_x < my_x || dest_x == x_length - 1) {
@@ -412,15 +415,15 @@ RoutingUnit::outportComputeTorus3DDeteministic(RouteInfo route,
         else {
             // prefer go to right
             if (dest_x > my_x || dest_x == 0) {
-                outport_dirn = "Right";
+                outport_dirn = "East";
             }
-            else outport_dirn = "Left";
+            else outport_dirn = "West";
         }
         return m_outports_dirn2idx[outport_dirn];
     }
 
     if (dest_y != my_y) {
-        left_distance = (my_y - dest_y + y_length) % y_length;
+        int left_distance = (my_y - dest_y + y_length) % y_length;
         if (left_distance * 2 <= y_length) {
             // prefer go to left
             if (dest_y < my_y || dest_y == y_length - 1) {
@@ -439,20 +442,20 @@ RoutingUnit::outportComputeTorus3DDeteministic(RouteInfo route,
     }
 
     if (dest_z != my_z) {
-        left_distance = (my_z - dest_z + z_length) % z_length;
+        int left_distance = (my_z - dest_z + z_length) % z_length;
         if (left_distance * 2 <= z_length) {
             // prefer go to left
             if (dest_z < my_z || dest_z == z_length - 1) {
-                outport_dirn = "Up";
+                outport_dirn = "Down";
             }
-            else outport_dirn = "Down";
+            else outport_dirn = "Up";
         }
         else {
             // prefer go to right
             if (dest_z > my_z || dest_z == 0) {
-                outport_dirn = "Down";
+                outport_dirn = "Up";
             }
-            else outport_dirn = "Up";
+            else outport_dirn = "Down";
         }
         return m_outports_dirn2idx[outport_dirn];
     }

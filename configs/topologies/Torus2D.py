@@ -16,10 +16,16 @@ class Torus2D(SimpleTopology):
 
 		num_routers = options.num_cpus
 
-		x_length = options.x_length
-		y_length = options.y_length
+		x_length = options.mesh_rows
+
+		assert x_length != 0, "In 2D dim topology, row number can't be 0"
+
+		y_length = int(num_routers / x_length)
 
 		assert x_length * y_length == num_routers, "num_rows * num_cols must equal num_routers"
+
+		network.x_length = x_length
+		network.y_length = y_length
 
 		link_latency = options.link_latency
 		router_latency = options.router_latency
