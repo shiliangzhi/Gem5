@@ -174,6 +174,44 @@ SwitchAllocator::arbitrate_inports()
                         }
                     }
                 }
+                else if (espace_algorithm == OBSERVE_) {
+                    int outvc = input_unit->get_outvc(invc);
+                    if (outvc == -1){
+                        // We should check to allocate new vc
+                        flit* t_flit = input_unit->peekTopFlit(invc);
+                        
+                        auto all_outports = t_flit->get_all_outport();
+                        bool flag = false;
+                        for (auto outport: all_outports) {
+                            bool make_request =
+                                send_allowed(inport, invc, outport, outvc);
+                            if (make_request) {
+                                m_input_arbiter_activity++;
+                                m_port_requests[inport] = outport;
+                                m_vc_winners[inport] = invc;
+                                input_unit->grant_outport(invc, outport);
+                                flag = true;
+
+                                break; // got one vc winner for this port
+                            }
+                        }
+                        if (flag) {
+                            break;
+                        }
+                    }
+                    else {
+                        int outport = input_unit->get_outport(invc);
+                        bool make_request =
+                            send_allowed(inport, invc, outport, outvc);
+                        if (make_request) {
+                            m_input_arbiter_activity++;
+                            m_port_requests[inport] = outport;
+                            m_vc_winners[inport] = invc;
+
+                            break; // got one vc winner for this port
+                        }
+                    }
+                }
                 else {
                     int outport = input_unit->get_outport(invc);
                     int outvc = input_unit->get_outvc(invc);

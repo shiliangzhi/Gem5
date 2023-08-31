@@ -57,6 +57,8 @@ class RoutingUnit
                       int inport,
                       PortDirection inport_dirn,
                       bool get_espace=false);
+    std::vector<int> outportComputeAll(RouteInfo route, int inport,
+                                       PortDirection inport_dirn);
 
     // Topology-agnostic Routing Table based routing (default)
     void addRoute(std::vector<NetDest>& routing_table_entry);
@@ -102,6 +104,14 @@ class RoutingUnit
     int outportComputeTorus3DShortXY(RouteInfo route,
                                      int inport,
                                      PortDirection inport_dirn);
+    
+    std::vector<int> outportAll2D(RouteInfo route,
+                                  int inport,
+                                  PortDirection inport_dirn);
+    
+    std::vector<int> outportAll3D(RouteInfo route,
+                                  int inport,
+                                  PortDirection inport_dirn);
 
     // Returns true if vnet is present in the vector
     // of vnets or if the vector supports all vnets.
