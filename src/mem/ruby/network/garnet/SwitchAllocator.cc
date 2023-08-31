@@ -149,7 +149,7 @@ SwitchAllocator::arbitrate_inports()
                             }
                         }
                         bool make_request =
-                            send_allowed(inport, invc, commom_outport, -1, 
+                            send_allowed(inport, invc, espace_outport, -1, 
                             /*vc_check=*/-1);
                         if (make_request) {
                             m_input_arbiter_activity++;
