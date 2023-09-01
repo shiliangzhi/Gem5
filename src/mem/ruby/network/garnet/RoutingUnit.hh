@@ -77,7 +77,7 @@ class RoutingUnit
     int outportComputeCustom(RouteInfo route,
                              int inport,
                              PortDirection inport_dirn);
-    
+
     // Routing for Ring
     int outportComputeRing(RouteInfo route,
                            int inport,
@@ -98,7 +98,7 @@ class RoutingUnit
     int outportComputeTorus3DTRY2(RouteInfo route,
                                   int inport,
                                   PortDirection inport_dirn);
-    
+
     int outportComputeTorus2DTRY1(RouteInfo route,
                                   int inport,
                                   PortDirection inport_dirn);

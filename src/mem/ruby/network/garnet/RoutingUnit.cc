@@ -197,11 +197,11 @@ RoutingUnit::outportCompute(RouteInfo route, int inport,
             outportComputeCustom(route, inport, inport_dirn); break;
         case Ring_: outport =
             outportComputeRing(route, inport, inport_dirn); break;
-        case Torus2DD_: outport = 
+        case Torus2DD_: outport =
             outportComputeTorus2DDeteministic(route, inport, inport_dirn); break;
         case Torus3DD_: outport =
             outportComputeTorus3DDeteministic(route, inport, inport_dirn); break;
-        case Torus3D1_: outport = 
+        case Torus3D1_: outport =
             outportComputeTorus3DTRY1(route, inport, inport_dirn); break;
         case Torus3D2_: outport =
             outportComputeTorus3DTRY2(route, inport, inport_dirn); break;
@@ -326,15 +326,15 @@ RoutingUnit::outportComputeRing(RouteInfo route,
 
 }
 
-int 
-RoutingUnit::outportComputeTorus2DDeteministic(RouteInfo route, 
-                                                int inport, 
+int
+RoutingUnit::outportComputeTorus2DDeteministic(RouteInfo route,
+                                                int inport,
                                                 PortDirection inport_dirn)
 {
     PortDirection outport_dirn = "Unknown";
     int my_id = m_router->get_id();
     int dest_id = route.dest_router;
-    
+
     int x_length = m_router->get_net_ptr()->getXLength();
     int y_length = m_router->get_net_ptr()->getYLength();
 
@@ -387,8 +387,8 @@ RoutingUnit::outportComputeTorus2DDeteministic(RouteInfo route,
 }
 
 int
-RoutingUnit::outportComputeTorus3DDeteministic(RouteInfo route, 
-                                                int inport, 
+RoutingUnit::outportComputeTorus3DDeteministic(RouteInfo route,
+                                                int inport,
                                                 PortDirection inport_dirn)
 {
     PortDirection outport_dirn = "Unknown";
@@ -466,8 +466,8 @@ RoutingUnit::outportComputeTorus3DDeteministic(RouteInfo route,
 }
 
 int
-RoutingUnit::outportComputeTorus3DTRY1(RouteInfo route, 
-                                        int inport, 
+RoutingUnit::outportComputeTorus3DTRY1(RouteInfo route,
+                                        int inport,
                                         PortDirection inport_dirn)
 {
     PortDirection outport_dirn = "Unknown";
@@ -526,8 +526,8 @@ RoutingUnit::outportComputeTorus3DTRY1(RouteInfo route,
     }
 }
 int
-RoutingUnit::outportComputeTorus2DTRY1(RouteInfo route, 
-                                        int inport, 
+RoutingUnit::outportComputeTorus2DTRY1(RouteInfo route,
+                                        int inport,
                                         PortDirection inport_dirn)
 {
     PortDirection outport_dirn = "Unknown";
@@ -579,8 +579,8 @@ long long C(int n, int m)
 	return ans;
 }
 
-int 
-RoutingUnit::outportComputeTorus3DTRY2(RouteInfo route, 
+int
+RoutingUnit::outportComputeTorus3DTRY2(RouteInfo route,
                                         int inport,
                                         PortDirection inport_dirn)
 {
@@ -600,7 +600,7 @@ RoutingUnit::outportComputeTorus3DTRY2(RouteInfo route,
     int dest_y = (dest_id / x_length) % y_length;
     int dest_z = dest_id / (x_length * y_length);
 
-    int x_hops = abs(dest_x - my_x); 
+    int x_hops = abs(dest_x - my_x);
     int y_hops = abs(dest_y - my_y);
     int z_hops = abs(dest_z - my_z);
 
@@ -653,8 +653,8 @@ RoutingUnit::outportComputeTorus3DTRY2(RouteInfo route,
 
 }
 
-int 
-RoutingUnit::outportComputeTorus2DTRY2(RouteInfo route, 
+int
+RoutingUnit::outportComputeTorus2DTRY2(RouteInfo route,
                                         int inport,
                                         PortDirection inport_dirn)
 {
@@ -671,7 +671,7 @@ RoutingUnit::outportComputeTorus2DTRY2(RouteInfo route,
     int dest_x = dest_id % x_length;
     int dest_y = (dest_id / x_length) % y_length;
 
-    int x_hops = abs(dest_x - my_x); 
+    int x_hops = abs(dest_x - my_x);
     int y_hops = abs(dest_y - my_y);
 
     int total_hops = x_hops + y_hops;
