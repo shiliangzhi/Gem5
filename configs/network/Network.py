@@ -104,7 +104,11 @@ def define_options(parser):
             2: Custom (see garnet/RoutingUnit.cc
             3: Ring
             4: Torus2DD
-            5: Torus3DD""",
+            5: Torus3DD
+            6: Torus3D1
+            7: Torus3D2
+            8: Torus2D1
+            9: Torus2D2""",
     )
     parser.add_argument(
         "--network-fault-model",

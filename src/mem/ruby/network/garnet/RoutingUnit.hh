@@ -91,6 +91,22 @@ class RoutingUnit
                                           int inport,
                                           PortDirection inport_dirn);
 
+    int outportComputeTorus3DTRY1(RouteInfo route,
+                                  int inport,
+                                  PortDirection inport_dirn);
+
+    int outportComputeTorus3DTRY2(RouteInfo route,
+                                  int inport,
+                                  PortDirection inport_dirn);
+    
+    int outportComputeTorus2DTRY1(RouteInfo route,
+                                  int inport,
+                                  PortDirection inport_dirn);
+
+    int outportComputeTorus2DTRY2(RouteInfo route,
+                                  int inport,
+                                  PortDirection inport_dirn);
+
     // Returns true if vnet is present in the vector
     // of vnets or if the vector supports all vnets.
     bool supportsVnet(int vnet, std::vector<int> sVnets);
