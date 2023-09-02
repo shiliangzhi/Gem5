@@ -119,6 +119,12 @@ def define_options(parser):
         switch to esapce vc)"""
     )
     parser.add_argument(
+        "--aevc",
+        action="store_true",
+        default=False,
+        help="Use Adaptive Escape Vitrual Channel algorithm."
+    )
+    parser.add_argument(
         "--network-fault-model",
         action="store_true",
         default=False,
@@ -198,6 +204,7 @@ def init_network(options, network, InterfaceClass):
         network.garnet_deadlock_threshold = options.garnet_deadlock_threshold
         network.wormhole = options.wormhole
         network.espace_algorithm = options.espace_algorithm
+        network.aevc = options.aevc
 
         # Create Bridges and connect them to the corresponding links
         for intLink in network.int_links:

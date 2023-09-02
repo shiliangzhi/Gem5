@@ -157,9 +157,11 @@ SwitchAllocator::arbitrate_inports()
                             m_vc_winners[inport] = invc;
                             t_flit->set_state(1); // Use Espace VC
                             input_unit->grant_outport(invc, espace_outport);
+                            m_router->get_net_ptr()->observe_fail(0);
 
                             break; // got one vc winner for this port
                         }
+                        m_router->get_net_ptr()->observe_fail(1);
                     }
                     else {
                         int outport = input_unit->get_outport(invc);
@@ -169,9 +171,11 @@ SwitchAllocator::arbitrate_inports()
                             m_input_arbiter_activity++;
                             m_port_requests[inport] = outport;
                             m_vc_winners[inport] = invc;
+                            m_router->get_net_ptr()->observe_fail(0);
 
                             break; // got one vc winner for this port
                         }
+                        m_router->get_net_ptr()->observe_fail(1);
                     }
                 }
                 else if (espace_algorithm == OBSERVE_) {
@@ -196,8 +200,10 @@ SwitchAllocator::arbitrate_inports()
                             }
                         }
                         if (flag) {
+                            m_router->get_net_ptr()->observe_fail(0);
                             break;
                         }
+                        m_router->get_net_ptr()->observe_fail(1);
                     }
                     else {
                         int outport = input_unit->get_outport(invc);
@@ -207,9 +213,72 @@ SwitchAllocator::arbitrate_inports()
                             m_input_arbiter_activity++;
                             m_port_requests[inport] = outport;
                             m_vc_winners[inport] = invc;
+                            m_router->get_net_ptr()->observe_fail(0);
 
                             break; // got one vc winner for this port
                         }
+                        m_router->get_net_ptr()->observe_fail(1);
+                    }
+                }
+                else if (espace_algorithm == COMBAIN_) {
+                    int outvc = input_unit->get_outvc(invc);
+                    if (outvc == -1) {
+                        // We should check to allocate new vc
+                        flit* t_flit = input_unit->peekTopFlit(invc);
+                        int espace_outport = t_flit->get_espace_outport();
+
+                        if (t_flit->get_state() == 0) {
+
+                            auto all_outports = t_flit->get_all_outport();
+                            bool flag = false;
+                            for(auto commom_outport: all_outports) {
+                                // We can still try to ask commom outport
+                                bool make_request =
+                                    send_allowed(inport, invc, commom_outport, -1, 
+                                    /*vc_check=*/1);
+                                if (make_request) {
+                                    m_input_arbiter_activity++;
+                                    m_port_requests[inport] = commom_outport;
+                                    m_vc_winners[inport] = invc;
+                                    input_unit->grant_outport(invc, commom_outport);
+                                    flag = true;
+
+                                    break; // got one vc winner for this port
+                                }
+                            }
+                            if(flag){
+                                m_router->get_net_ptr()->observe_fail(0);
+                                break;
+                            }
+                        }
+                        bool make_request =
+                            send_allowed(inport, invc, espace_outport, -1, 
+                            /*vc_check=*/-1);
+                        if (make_request) {
+                            m_input_arbiter_activity++;
+                            m_port_requests[inport] = espace_outport;
+                            m_vc_winners[inport] = invc;
+                            t_flit->set_state(1); // Use Espace VC
+                            input_unit->grant_outport(invc, espace_outport);
+                            m_router->get_net_ptr()->observe_fail(0);
+
+                            break; // got one vc winner for this port
+                        }
+                        m_router->get_net_ptr()->observe_fail(1);
+                    }
+                    else{
+                        int outport = input_unit->get_outport(invc);
+                        bool make_request =
+                            send_allowed(inport, invc, outport, outvc);
+                        if (make_request) {
+                            m_input_arbiter_activity++;
+                            m_port_requests[inport] = outport;
+                            m_vc_winners[inport] = invc;
+                            m_router->get_net_ptr()->observe_fail(0);
+
+                            break; // got one vc winner for this port
+                        }
+                        m_router->get_net_ptr()->observe_fail(1);
                     }
                 }
                 else {
@@ -231,9 +300,11 @@ SwitchAllocator::arbitrate_inports()
                         m_input_arbiter_activity++;
                         m_port_requests[inport] = outport;
                         m_vc_winners[inport] = invc;
+                        m_router->get_net_ptr()->observe_fail(0);
 
                         break; // got one vc winner for this port
                     }
+                    m_router->get_net_ptr()->observe_fail(1);
                 }
             }
 
@@ -283,7 +354,7 @@ SwitchAllocator::arbitrate_outports()
                     EspaceAlgorithm espace_algorithm = (EspaceAlgorithm) m_router->
                                                         get_net_ptr()->getEspaceAlgorithm();
                     
-                    if(espace_algorithm == SIMPLE_) {
+                    if(espace_algorithm == SIMPLE_ || espace_algorithm == COMBAIN_) {
                         flit* t_flit = input_unit->peekTopFlit(invc);
                         if (t_flit->get_state() == 0) {
                             outvc = vc_allocate(outport, inport, invc, /*vc_check=*/1);

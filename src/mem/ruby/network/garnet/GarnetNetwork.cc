@@ -72,7 +72,16 @@ GarnetNetwork::GarnetNetwork(const Params &p)
     m_routing_algorithm = p.routing_algorithm;
     m_espace_algorithm = p.espace_algorithm;
     m_use_wormhole = p.wormhole;
+    m_use_aevc = p.aevc;
     m_next_packet_id = 0;
+    observe_sum = observe_head = 0;
+    num_escape_vc = 1;
+    calm_peroid = calm_peroid_base = 0;
+    first_increase = true;
+
+    for (int i = 0; i < 100; i ++) {
+        observe_list[i] = 0;
+    }
 
     m_x_length = p.x_length;
     m_y_length = p.y_length;
@@ -117,6 +126,42 @@ GarnetNetwork::GarnetNetwork(const Params &p)
 
     // Print Garnet version
     inform("Garnet version %s\n", garnetVersion);
+}
+
+void 
+GarnetNetwork::observe_fail(int result)
+{
+    observe_sum -= observe_list[observe_head];
+    observe_list[observe_head] = result;
+    observe_sum += observe_list[observe_head];
+    observe_head = (observe_head + 1) % 100;
+
+    if (m_use_aevc) {
+        if (observe_sum >= 25) {
+            num_escape_vc ++;
+            if(num_escape_vc >= m_max_vcs_per_vnet) {
+                num_escape_vc = (int)m_max_vcs_per_vnet - 1;
+            }
+            calm_peroid = calm_peroid_base;
+            calm_peroid_base = calm_peroid_base * 2 + 1;
+            if (calm_peroid_base > 10000){
+                calm_peroid_base = 10000;
+            }
+            first_increase = false;
+        }
+        else if(observe_sum <= 5) {
+            if (calm_peroid == 0) {
+                num_escape_vc --;
+                first_increase = true;
+                if (num_escape_vc == 0) {
+                    num_escape_vc = 1;
+                }
+            }
+            else{
+                calm_peroid --;
+            }
+        }
+    }
 }
 
 void

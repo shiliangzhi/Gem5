@@ -85,7 +85,11 @@ class GarnetNetwork : public Network
     uint32_t getBuffersPerDataVC() { return m_buffers_per_data_vc; }
     uint32_t getBuffersPerCtrlVC() { return m_buffers_per_ctrl_vc; }
     int getRoutingAlgorithm() const { return m_routing_algorithm; }
-    int getEspaceAlgorithm() const {return m_espace_algorithm; }
+    int getEspaceAlgorithm() const { return m_espace_algorithm; }
+    bool checkAEVC() const { return m_use_aevc; }
+    int getNumberEscapeVC() const { return num_escape_vc; }
+
+    void observe_fail(int result);
 
     bool isFaultModelEnabled() const { return m_enable_fault_model; }
     FaultModel* fault_model;
@@ -175,6 +179,12 @@ class GarnetNetwork : public Network
     int m_espace_algorithm;
     bool m_enable_fault_model;
     bool m_use_wormhole;
+    bool m_use_aevc;
+
+    int observe_list[105];
+    int observe_sum, observe_head;
+    int num_escape_vc, calm_peroid, calm_peroid_base;
+    bool first_increase;
 
     int m_x_length;
     int m_y_length;

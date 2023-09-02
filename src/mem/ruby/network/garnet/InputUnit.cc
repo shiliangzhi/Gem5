@@ -138,6 +138,19 @@ InputUnit::wakeup()
                         t_flit->insert_port(it);
                     }
                 }
+                else if (espace_algorithm == COMBAIN_){
+                    auto outports = m_router->route_compute_all(t_flit->get_route(),
+                        m_id, m_direction);
+                    int espace_outport = m_router->route_compute(t_flit->get_route(),
+                        m_id, m_direction, true);
+                    
+                    t_flit->clear_possible_outport();
+                    t_flit->set_espace_outport(espace_outport);
+
+                    for(auto it: outports) {
+                        t_flit->insert_port(it);
+                    }
+                }
                 else {
                     // Route computation for this vc
                     int outport = m_router->route_compute(t_flit->get_route(),

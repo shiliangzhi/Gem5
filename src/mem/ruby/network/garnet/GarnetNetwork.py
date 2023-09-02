@@ -49,6 +49,7 @@ class GarnetNetwork(RubyNetwork):
     enable_fault_model = Param.Bool(False, "enable network fault model")
     fault_model = Param.FaultModel(NULL, "network fault model")
     wormhole = Param.Bool(False, "Use worm hole flow control")
+    aevc = Param.Bool(False, "Use Adaptive Escape Vitrual Channel algorithm")
     x_length = Param.Int(0, "x dimension of the mesh/torus")
     y_length = Param.Int(0, "y dimension of the mesh/torus")
     z_length = Param.Int(0, "z dimension of the mesh/torus")

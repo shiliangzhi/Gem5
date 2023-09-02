@@ -53,7 +53,7 @@ enum link_type { EXT_IN_, EXT_OUT_, INT_, NUM_LINK_TYPES_ };
 enum RoutingAlgorithm { TABLE_ = 0, XY_ = 1, CUSTOM_ = 2, Ring_ = 3, Torus2DD_ = 4, 
                         Torus3DD_ = 5, ShortXY = 6, ShortXYZ = 7,
                         NUM_ROUTING_ALGORITHM_};
-enum EspaceAlgorithm { NO_ESPACE_ = 0, SIMPLE_ = 1, OBSERVE_ = 2, NUM_ESPACE_ALGORITHM_};
+enum EspaceAlgorithm { NO_ESPACE_ = 0, SIMPLE_ = 1, OBSERVE_ = 2, COMBAIN_ = 3, NUM_ESPACE_ALGORITHM_};
 
 struct RouteInfo
 {
