@@ -68,6 +68,7 @@ class flit
     int get_common_outport() {return m_common_outport;}
     int get_espace_outport() {return m_espace_outport;}
     int get_state() {return m_state;}
+    int get_num_escape_vc() { return num_escape_vc; }
     RouteInfo get_route() { return m_route; }
     MsgPtr& get_msg_ptr() { return m_msg_ptr; }
     flit_type get_type() { return m_type; }
@@ -84,6 +85,7 @@ class flit
     void set_common_outport(int outport) { m_common_outport = outport; }
     void set_espace_outport(int outport) { m_espace_outport = outport;}
     void set_state(int state) { m_state = state; }
+    void set_num_escape_vc(int num_vc) { num_escape_vc = num_vc; }
     void clear_possible_outport() { possible_port.clear(); }
     void insert_port(int port) { possible_port.push_back(port); }
     std::vector<int> get_all_outport() { return possible_port; }
@@ -131,7 +133,7 @@ class flit
     int m_vc;
 
     int m_state; // 0: in common vc, 1: in espace vc
-    int m_common_outport, m_espace_outport;
+    int m_common_outport, m_espace_outport, num_escape_vc;
 
     std::vector<int> possible_port;
 

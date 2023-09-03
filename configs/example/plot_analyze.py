@@ -4,30 +4,35 @@ os.system("echo > network_stats.txt")
 cmd = "./build/NULL/gem5.opt \
 configs/example/garnet_synth_traffic.py \
 --network=garnet --num-cpus=64 --num-dirs=64 \
---topology=Mesh_XY --mesh-rows=8 --routing-algorithm 1 \
+--topology=Torus2D --mesh-rows=8 --routing-algorithm=6 \
 --inj-vnet=0 --synthetic=uniform_random \
---sim-cycles=20000 --vcs-per-vnet 1 --wormhole "
+--sim-cycles=20000 --espace-algorithm=2 "
 
 rate_list = [
-    0.05,
-    0.1,
-    0.15,
-    0.2,
-    0.25,
-    0.3,
-    0.35,
-    0.4,
-    0.45,
-    0.5,
-    0.55,
-    0.6,
+    0.62,
+    0.63,
+    0.64,
     0.65,
+    0.66,
+    0.67,
+    0.68,
+    0.69,
     0.7,
+    0.71,
+    0.72,
+    0.73,
+    0.74,
     0.75,
+    0.76,
+    0.77,
+    0.78,
+    0.79,
     0.8,
-    0.85,
-    0.9,
-    0.95,
+    0.81,
+    0.82,
+    0.83,
+    0.84,
+    0.85
 ]
 
 for rate in rate_list:

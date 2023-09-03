@@ -129,15 +129,15 @@ OutputUnit::has_free_place(int vnet)
 
 // Assign a free output VC to the winner of Switch Allocation
 int
-OutputUnit::select_free_vc(int vnet, int vc_check)
+OutputUnit::select_free_vc(int vnet, int vc_check, int num_vc)
 {
     int vc_base = vnet*m_vc_per_vnet;
     int num_escape_vc = m_router->get_net_ptr()->getNumberEscapeVC();
     for (int vc = vc_base; vc < vc_base + m_vc_per_vnet; vc++) {
-        if (vc_check == 1 && vc >= vc_base + m_vc_per_vnet - num_escape_vc) {
+        if (vc_check == 1 && vc >= vc_base + m_vc_per_vnet - num_vc) {
             continue;
         }
-        if (vc_check == -1 && vc < vc_base + m_vc_per_vnet - num_escape_vc) {
+        if (vc_check == -1 && vc < vc_base + m_vc_per_vnet - num_vc) {
             continue;
         }
         if (is_vc_idle(vc, curTick())) {

@@ -144,6 +144,8 @@ SwitchAllocator::arbitrate_inports()
                                 m_port_requests[inport] = commom_outport;
                                 m_vc_winners[inport] = invc;
                                 input_unit->grant_outport(invc, commom_outport);
+                                t_flit->set_num_escape_vc(m_router->get_net_ptr()->getNumberEscapeVC());
+                                m_router->get_net_ptr()->observe_fail(0);
 
                                 break; // got one vc winner for this port
                             }
@@ -157,6 +159,7 @@ SwitchAllocator::arbitrate_inports()
                             m_vc_winners[inport] = invc;
                             t_flit->set_state(1); // Use Espace VC
                             input_unit->grant_outport(invc, espace_outport);
+                            t_flit->set_num_escape_vc(m_router->get_net_ptr()->getNumberEscapeVC());
                             m_router->get_net_ptr()->observe_fail(0);
 
                             break; // got one vc winner for this port
@@ -164,6 +167,7 @@ SwitchAllocator::arbitrate_inports()
                         m_router->get_net_ptr()->observe_fail(1);
                     }
                     else {
+                        flit* t_flit = input_unit->peekTopFlit(invc);
                         int outport = input_unit->get_outport(invc);
                         bool make_request =
                             send_allowed(inport, invc, outport, outvc);
@@ -171,6 +175,7 @@ SwitchAllocator::arbitrate_inports()
                             m_input_arbiter_activity++;
                             m_port_requests[inport] = outport;
                             m_vc_winners[inport] = invc;
+                            t_flit->set_num_escape_vc(m_router->get_net_ptr()->getNumberEscapeVC());
                             m_router->get_net_ptr()->observe_fail(0);
 
                             break; // got one vc winner for this port
@@ -194,6 +199,7 @@ SwitchAllocator::arbitrate_inports()
                                 m_port_requests[inport] = outport;
                                 m_vc_winners[inport] = invc;
                                 input_unit->grant_outport(invc, outport);
+                                t_flit->set_num_escape_vc(m_router->get_net_ptr()->getNumberEscapeVC());
                                 flag = true;
 
                                 break; // got one vc winner for this port
@@ -206,6 +212,7 @@ SwitchAllocator::arbitrate_inports()
                         m_router->get_net_ptr()->observe_fail(1);
                     }
                     else {
+                        flit* t_flit = input_unit->peekTopFlit(invc);
                         int outport = input_unit->get_outport(invc);
                         bool make_request =
                             send_allowed(inport, invc, outport, outvc);
@@ -213,6 +220,7 @@ SwitchAllocator::arbitrate_inports()
                             m_input_arbiter_activity++;
                             m_port_requests[inport] = outport;
                             m_vc_winners[inport] = invc;
+                            t_flit->set_num_escape_vc(m_router->get_net_ptr()->getNumberEscapeVC());
                             m_router->get_net_ptr()->observe_fail(0);
 
                             break; // got one vc winner for this port
@@ -241,6 +249,7 @@ SwitchAllocator::arbitrate_inports()
                                     m_port_requests[inport] = commom_outport;
                                     m_vc_winners[inport] = invc;
                                     input_unit->grant_outport(invc, commom_outport);
+                                    t_flit->set_num_escape_vc(m_router->get_net_ptr()->getNumberEscapeVC());
                                     flag = true;
 
                                     break; // got one vc winner for this port
@@ -260,6 +269,7 @@ SwitchAllocator::arbitrate_inports()
                             m_vc_winners[inport] = invc;
                             t_flit->set_state(1); // Use Espace VC
                             input_unit->grant_outport(invc, espace_outport);
+                            t_flit->set_num_escape_vc(m_router->get_net_ptr()->getNumberEscapeVC());
                             m_router->get_net_ptr()->observe_fail(0);
 
                             break; // got one vc winner for this port
@@ -267,6 +277,7 @@ SwitchAllocator::arbitrate_inports()
                         m_router->get_net_ptr()->observe_fail(1);
                     }
                     else{
+                        flit* t_flit = input_unit->peekTopFlit(invc);
                         int outport = input_unit->get_outport(invc);
                         bool make_request =
                             send_allowed(inport, invc, outport, outvc);
@@ -274,6 +285,7 @@ SwitchAllocator::arbitrate_inports()
                             m_input_arbiter_activity++;
                             m_port_requests[inport] = outport;
                             m_vc_winners[inport] = invc;
+                            t_flit->set_num_escape_vc(m_router->get_net_ptr()->getNumberEscapeVC());
                             m_router->get_net_ptr()->observe_fail(0);
 
                             break; // got one vc winner for this port
@@ -282,6 +294,7 @@ SwitchAllocator::arbitrate_inports()
                     }
                 }
                 else {
+                    flit* t_flit = input_unit->peekTopFlit(invc);
                     int outport = input_unit->get_outport(invc);
                     int outvc = input_unit->get_outvc(invc);
 
@@ -300,6 +313,7 @@ SwitchAllocator::arbitrate_inports()
                         m_input_arbiter_activity++;
                         m_port_requests[inport] = outport;
                         m_vc_winners[inport] = invc;
+                        t_flit->set_num_escape_vc(m_router->get_net_ptr()->getNumberEscapeVC());
                         m_router->get_net_ptr()->observe_fail(0);
 
                         break; // got one vc winner for this port
@@ -357,10 +371,10 @@ SwitchAllocator::arbitrate_outports()
                     if(espace_algorithm == SIMPLE_ || espace_algorithm == COMBAIN_) {
                         flit* t_flit = input_unit->peekTopFlit(invc);
                         if (t_flit->get_state() == 0) {
-                            outvc = vc_allocate(outport, inport, invc, /*vc_check=*/1);
+                            outvc = vc_allocate(outport, inport, invc, /*vc_check=*/1, /*vc_num=*/t_flit->get_num_escape_vc());
                         }
                         else {
-                            outvc = vc_allocate(outport, inport, invc, /*vc_check=*/-1);
+                            outvc = vc_allocate(outport, inport, invc, /*vc_check=*/-1, /*vc_num=*/t_flit->get_num_escape_vc());
                         }
                     }
                     else {
@@ -544,7 +558,7 @@ SwitchAllocator::send_allowed(int inport, int invc, int outport, int outvc, int 
 
 // Assign a free VC to the winner of the output port.
 int
-SwitchAllocator::vc_allocate(int outport, int inport, int invc, int vc_check)
+SwitchAllocator::vc_allocate(int outport, int inport, int invc, int vc_check, int num_vc)
 {
     if (m_use_wormhole) {
         // If use wormhole, we just need to allocate vc for flit
@@ -556,7 +570,7 @@ SwitchAllocator::vc_allocate(int outport, int inport, int invc, int vc_check)
     else {
         // Select a free VC from the output port
         int outvc =
-            m_router->getOutputUnit(outport)->select_free_vc(get_vnet(invc), vc_check);
+            m_router->getOutputUnit(outport)->select_free_vc(get_vnet(invc), vc_check, num_vc);
 
         // has to get a valid VC since it checked before performing SA
         assert(outvc != -1);
