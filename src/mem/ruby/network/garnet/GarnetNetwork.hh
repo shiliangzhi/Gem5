@@ -183,7 +183,7 @@ class GarnetNetwork : public Network
 
     int observe_list[105];
     int observe_sum, observe_head;
-    int num_escape_vc, calm_peroid, calm_peroid_base;
+    int num_escape_vc, calm_peroid, calm_peroid_base, observe_interval;
     bool first_increase;
 
     int m_x_length;

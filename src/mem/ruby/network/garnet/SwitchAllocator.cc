@@ -137,7 +137,7 @@ SwitchAllocator::arbitrate_inports()
                         if (t_flit->get_state() == 0) {
                             // We can still try to ask commom outport
                             bool make_request =
-                                send_allowed(inport, invc, commom_outport, -1, 
+                                send_allowed(inport, invc, commom_outport, -1,
                                 /*vc_check=*/1);
                             if (make_request) {
                                 m_input_arbiter_activity++;
@@ -151,7 +151,7 @@ SwitchAllocator::arbitrate_inports()
                             }
                         }
                         bool make_request =
-                            send_allowed(inport, invc, espace_outport, -1, 
+                            send_allowed(inport, invc, espace_outport, -1,
                             /*vc_check=*/-1);
                         if (make_request) {
                             m_input_arbiter_activity++;
@@ -188,7 +188,7 @@ SwitchAllocator::arbitrate_inports()
                     if (outvc == -1){
                         // We should check to allocate new vc
                         flit* t_flit = input_unit->peekTopFlit(invc);
-                        
+
                         auto all_outports = t_flit->get_all_outport();
                         bool flag = false;
                         for (auto outport: all_outports) {
@@ -242,7 +242,7 @@ SwitchAllocator::arbitrate_inports()
                             for(auto commom_outport: all_outports) {
                                 // We can still try to ask commom outport
                                 bool make_request =
-                                    send_allowed(inport, invc, commom_outport, -1, 
+                                    send_allowed(inport, invc, commom_outport, -1,
                                     /*vc_check=*/1);
                                 if (make_request) {
                                     m_input_arbiter_activity++;
@@ -261,7 +261,7 @@ SwitchAllocator::arbitrate_inports()
                             }
                         }
                         bool make_request =
-                            send_allowed(inport, invc, espace_outport, -1, 
+                            send_allowed(inport, invc, espace_outport, -1,
                             /*vc_check=*/-1);
                         if (make_request) {
                             m_input_arbiter_activity++;
@@ -367,7 +367,7 @@ SwitchAllocator::arbitrate_outports()
                 if (outvc == -1) {
                     EspaceAlgorithm espace_algorithm = (EspaceAlgorithm) m_router->
                                                         get_net_ptr()->getEspaceAlgorithm();
-                    
+
                     if(espace_algorithm == SIMPLE_ || espace_algorithm == COMBAIN_) {
                         flit* t_flit = input_unit->peekTopFlit(invc);
                         if (t_flit->get_state() == 0) {

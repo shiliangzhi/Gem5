@@ -6,9 +6,21 @@ configs/example/garnet_synth_traffic.py \
 --network=garnet --num-cpus=64 --num-dirs=64 \
 --topology=Torus2D --mesh-rows=8 --routing-algorithm=6 \
 --inj-vnet=0 --synthetic=uniform_random \
---sim-cycles=20000 --espace-algorithm=2 "
+--sim-cycles=20000 --espace-algorithm=3 --aevc "
 
 rate_list = [
+    # 0.5,
+    # 0.51,
+    # 0.52,
+    # 0.53,
+    # 0.54,
+    # 0.55,
+    # 0.56,
+    # 0.57,
+    # 0.58,
+    # 0.59,
+    # 0.6,
+    # 0.61,
     0.62,
     0.63,
     0.64,
@@ -38,10 +50,13 @@ rate_list = [
 for rate in rate_list:
     cmd_tmp = cmd + "--injectionrate {:.3f}".format(rate)
     os.system(cmd_tmp)
-    #     cmd2 = "grep \"average_packet_latency\" m5out/stats.txt \
-    #             | sed 's/system.ruby.network.average_packet_latency\s*//' \
-    #             >> network_stats.txt"
-    cmd2 = "grep \"packets_received::total\" m5out/stats.txt \
-            | sed 's/system.ruby.network.packets_received::total\s*//' \
+    cmd2 = "grep \"average_packet_latency\" m5out/stats.txt \
+            | sed 's/system.ruby.network.average_packet_latency\s*//' \
             >> network_stats.txt"
+    # cmd2 = "grep \"average_hops\" m5out/stats.txt \
+    #         | sed 's/system.ruby.network.average_hops\s*//' \
+    #         >> network_stats.txt"
+    # cmd2 = "grep \"packets_received::total\" m5out/stats.txt \
+    #         | sed 's/system.ruby.network.packets_received::total\s*//' \
+    #         >> network_stats.txt"
     os.system(cmd2)

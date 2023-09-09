@@ -74,7 +74,7 @@ GarnetNetwork::GarnetNetwork(const Params &p)
     m_use_wormhole = p.wormhole;
     m_use_aevc = p.aevc;
     m_next_packet_id = 0;
-    observe_sum = observe_head = 0;
+    observe_sum = observe_head = observe_interval = 0;
     num_escape_vc = 1;
     calm_peroid = calm_peroid_base = 0;
     first_increase = true;
@@ -135,9 +135,13 @@ GarnetNetwork::observe_fail(int result)
     observe_list[observe_head] = result;
     observe_sum += observe_list[observe_head];
     observe_head = (observe_head + 1) % 100;
+    if (observe_interval > 0) {
+        observe_interval --;
+    }
 
-    if (m_use_aevc) {
-        if (observe_sum >= 25) {
+    if (m_use_aevc /*&& (observe_interval == 0)*/) {
+        if (observe_sum >= 50) {
+            observe_interval = 100;
             num_escape_vc ++;
             if(num_escape_vc >= m_max_vcs_per_vnet) {
                 num_escape_vc = (int)m_max_vcs_per_vnet - 1;
@@ -150,6 +154,7 @@ GarnetNetwork::observe_fail(int result)
             first_increase = false;
         }
         else if(observe_sum <= 5) {
+            observe_interval = 100;
             if (calm_peroid == 0) {
                 num_escape_vc --;
                 first_increase = true;
