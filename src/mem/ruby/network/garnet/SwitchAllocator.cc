@@ -123,26 +123,117 @@ SwitchAllocator::arbitrate_inports()
             if (input_unit->need_stage(invc, SA_, curTick())) {
                 // This flit is in SA stage
 
-                int outport = input_unit->get_outport(invc);
-                int outvc = input_unit->get_outvc(invc);
+                EspaceAlgorithm espace_algorithm = (EspaceAlgorithm) m_router->
+                                                    get_net_ptr()->getEspaceAlgorithm();
 
-                // Since we only care signal flit packets in wormhole algorithm,
-                // we need allocate out vc every time
-                if (m_use_wormhole) {
-                    outvc = -1;
+                if (espace_algorithm == SIMPLE_) {
+                    int outvc = input_unit->get_outvc(invc);
+                    if (outvc == -1){
+                        // We should check to allocate new vc
+                        flit* t_flit = input_unit->peekTopFlit(invc);
+                        int commom_outport = t_flit->get_common_outport();
+                        int espace_outport = t_flit->get_espace_outport();
+
+                        if (t_flit->get_state() == 0) {
+                            // We can still try to ask commom outport
+                            bool make_request =
+                                send_allowed(inport, invc, commom_outport, -1, 
+                                /*vc_check=*/1);
+                            if (make_request) {
+                                m_input_arbiter_activity++;
+                                m_port_requests[inport] = commom_outport;
+                                m_vc_winners[inport] = invc;
+                                input_unit->grant_outport(invc, commom_outport);
+
+                                break; // got one vc winner for this port
+                            }
+                        }
+                        bool make_request =
+                            send_allowed(inport, invc, espace_outport, -1, 
+                            /*vc_check=*/-1);
+                        if (make_request) {
+                            m_input_arbiter_activity++;
+                            m_port_requests[inport] = espace_outport;
+                            m_vc_winners[inport] = invc;
+                            t_flit->set_state(1); // Use Espace VC
+                            input_unit->grant_outport(invc, espace_outport);
+
+                            break; // got one vc winner for this port
+                        }
+                    }
+                    else {
+                        int outport = input_unit->get_outport(invc);
+                        bool make_request =
+                            send_allowed(inport, invc, outport, outvc);
+                        if (make_request) {
+                            m_input_arbiter_activity++;
+                            m_port_requests[inport] = outport;
+                            m_vc_winners[inport] = invc;
+
+                            break; // got one vc winner for this port
+                        }
+                    }
                 }
+                else if (espace_algorithm == OBSERVE_) {
+                    int outvc = input_unit->get_outvc(invc);
+                    if (outvc == -1){
+                        // We should check to allocate new vc
+                        flit* t_flit = input_unit->peekTopFlit(invc);
+                        
+                        auto all_outports = t_flit->get_all_outport();
+                        bool flag = false;
+                        for (auto outport: all_outports) {
+                            bool make_request =
+                                send_allowed(inport, invc, outport, outvc);
+                            if (make_request) {
+                                m_input_arbiter_activity++;
+                                m_port_requests[inport] = outport;
+                                m_vc_winners[inport] = invc;
+                                input_unit->grant_outport(invc, outport);
+                                flag = true;
 
-                // check if the flit in this InputVC is allowed to be sent
-                // send_allowed conditions described in that function.
-                bool make_request =
-                    send_allowed(inport, invc, outport, outvc);
+                                break; // got one vc winner for this port
+                            }
+                        }
+                        if (flag) {
+                            break;
+                        }
+                    }
+                    else {
+                        int outport = input_unit->get_outport(invc);
+                        bool make_request =
+                            send_allowed(inport, invc, outport, outvc);
+                        if (make_request) {
+                            m_input_arbiter_activity++;
+                            m_port_requests[inport] = outport;
+                            m_vc_winners[inport] = invc;
 
-                if (make_request) {
-                    m_input_arbiter_activity++;
-                    m_port_requests[inport] = outport;
-                    m_vc_winners[inport] = invc;
+                            break; // got one vc winner for this port
+                        }
+                    }
+                }
+                else {
+                    int outport = input_unit->get_outport(invc);
+                    int outvc = input_unit->get_outvc(invc);
 
-                    break; // got one vc winner for this port
+                    // Since we only care signal flit packets in wormhole algorithm,
+                    // we need allocate out vc every time
+                    if (m_use_wormhole) {
+                        outvc = -1;
+                    }
+
+                    // check if the flit in this InputVC is allowed to be sent
+                    // send_allowed conditions described in that function.
+                    bool make_request =
+                        send_allowed(inport, invc, outport, outvc);
+
+                    if (make_request) {
+                        m_input_arbiter_activity++;
+                        m_port_requests[inport] = outport;
+                        m_vc_winners[inport] = invc;
+
+                        break; // got one vc winner for this port
+                    }
                 }
             }
 
@@ -189,8 +280,22 @@ SwitchAllocator::arbitrate_outports()
 
                 int outvc = input_unit->get_outvc(invc);
                 if (outvc == -1) {
-                    // VC Allocation - select any free VC from outport
-                    outvc = vc_allocate(outport, inport, invc);
+                    EspaceAlgorithm espace_algorithm = (EspaceAlgorithm) m_router->
+                                                        get_net_ptr()->getEspaceAlgorithm();
+                    
+                    if(espace_algorithm == SIMPLE_) {
+                        flit* t_flit = input_unit->peekTopFlit(invc);
+                        if (t_flit->get_state() == 0) {
+                            outvc = vc_allocate(outport, inport, invc, /*vc_check=*/1);
+                        }
+                        else {
+                            outvc = vc_allocate(outport, inport, invc, /*vc_check=*/-1);
+                        }
+                    }
+                    else {
+                        // VC Allocation - select any free VC from outport
+                        outvc = vc_allocate(outport, inport, invc);
+                    }
                 }
 
                 // remove flit from Input VC
@@ -303,7 +408,7 @@ SwitchAllocator::arbitrate_outports()
  */
 
 bool
-SwitchAllocator::send_allowed(int inport, int invc, int outport, int outvc)
+SwitchAllocator::send_allowed(int inport, int invc, int outport, int outvc, int vc_check)
 {
     // Check if outvc needed
     // Check if credit needed (for multi-flit packet)
@@ -326,7 +431,7 @@ SwitchAllocator::send_allowed(int inport, int invc, int outport, int outvc)
                 has_credit = true;
             }
         }
-        else if (output_unit->has_free_vc(vnet)) {
+        else if (output_unit->has_free_vc(vnet, vc_check)) {
 
             has_outvc = true;
 
@@ -368,7 +473,7 @@ SwitchAllocator::send_allowed(int inport, int invc, int outport, int outvc)
 
 // Assign a free VC to the winner of the output port.
 int
-SwitchAllocator::vc_allocate(int outport, int inport, int invc)
+SwitchAllocator::vc_allocate(int outport, int inport, int invc, int vc_check)
 {
     if (m_use_wormhole) {
         // If use wormhole, we just need to allocate vc for flit
@@ -380,7 +485,7 @@ SwitchAllocator::vc_allocate(int outport, int inport, int invc)
     else {
         // Select a free VC from the output port
         int outvc =
-            m_router->getOutputUnit(outport)->select_free_vc(get_vnet(invc));
+            m_router->getOutputUnit(outport)->select_free_vc(get_vnet(invc), vc_check);
 
         // has to get a valid VC since it checked before performing SA
         assert(outvc != -1);

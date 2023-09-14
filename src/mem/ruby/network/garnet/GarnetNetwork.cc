@@ -70,6 +70,7 @@ GarnetNetwork::GarnetNetwork(const Params &p)
     m_buffers_per_data_vc = p.buffers_per_data_vc;
     m_buffers_per_ctrl_vc = p.buffers_per_ctrl_vc;
     m_routing_algorithm = p.routing_algorithm;
+    m_espace_algorithm = p.espace_algorithm;
     m_use_wormhole = p.wormhole;
     m_next_packet_id = 0;
 

@@ -55,7 +55,10 @@ class RoutingUnit
     RoutingUnit(Router *router);
     int outportCompute(RouteInfo route,
                       int inport,
-                      PortDirection inport_dirn);
+                      PortDirection inport_dirn,
+                      bool get_espace=false);
+    std::vector<int> outportComputeAll(RouteInfo route, int inport,
+                                       PortDirection inport_dirn);
 
     // Topology-agnostic Routing Table based routing (default)
     void addRoute(std::vector<NetDest>& routing_table_entry);
@@ -83,6 +86,8 @@ class RoutingUnit
                            int inport,
                            PortDirection inport_dirn);
 
+    // Deterministic routing algorithm with deadlock free
+    // If we use espace vc, base algorithm is these
     int outportComputeTorus2DDeteministic(RouteInfo route,
                                           int inport,
                                           PortDirection inport_dirn);
@@ -91,19 +96,28 @@ class RoutingUnit
                                           int inport,
                                           PortDirection inport_dirn);
 
-    int outportComputeTorus3DTRY1(RouteInfo route,
-                                  int inport,
-                                  PortDirection inport_dirn);
 
     int outportComputeTorus3DTRY2(RouteInfo route,
                                   int inport,
                                   PortDirection inport_dirn);
 
-    int outportComputeTorus2DTRY1(RouteInfo route,
+    int outportComputeTorus2DTRY2(RouteInfo route,
                                   int inport,
                                   PortDirection inport_dirn);
-
-    int outportComputeTorus2DTRY2(RouteInfo route,
+    // Deterministic routing algorithm, but not guarantee deadlock free
+    int outportComputeTorus2DShortXY(RouteInfo route,
+                                     int inport,
+                                     PortDirection inport_dirn);
+    
+    int outportComputeTorus3DShortXY(RouteInfo route,
+                                     int inport,
+                                     PortDirection inport_dirn);
+    
+    std::vector<int> outportAll2D(RouteInfo route,
+                                  int inport,
+                                  PortDirection inport_dirn);
+    
+    std::vector<int> outportAll3D(RouteInfo route,
                                   int inport,
                                   PortDirection inport_dirn);
 

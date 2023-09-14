@@ -159,9 +159,15 @@ Router::getInportDirection(int inport)
 }
 
 int
-Router::route_compute(RouteInfo route, int inport, PortDirection inport_dirn)
+Router::route_compute(RouteInfo route, int inport, PortDirection inport_dirn, bool get_espace)
 {
-    return routingUnit.outportCompute(route, inport, inport_dirn);
+    return routingUnit.outportCompute(route, inport, inport_dirn, get_espace);
+}
+
+std::vector<int>
+Router::route_compute_all(RouteInfo route, int inport, PortDirection inport_dirn)
+{
+    return routingUnit.outportComputeAll(route, inport, inport_dirn);
 }
 
 void

@@ -87,12 +87,6 @@ InputUnit::wakeup()
         int vc = t_flit->get_vc();
         t_flit->increment_hops(); // for stats
 
-        // puts("==========Input check==========");
-        // std::cout << "Inport id: " << m_id << std::endl;
-        // std::cout << "Inport direction: " << m_direction << std::endl;
-        // std::cout << "Flit vc: " << vc << std::endl;
-        // std::cout << "Use wormhole: " << m_use_wormhole << std::endl;
-
         if (m_use_wormhole) {
             // Wormhole algorithm only support for signal flit packet now
             assert(t_flit->get_type() == HEAD_TAIL_);
@@ -105,8 +99,6 @@ InputUnit::wakeup()
             int outport = m_router->route_compute(t_flit->get_route(),
                 m_id, m_direction);
 
-            // std::cout << "Outport check: " << outport << std::endl;
-
             // Wormhole algorithm save outport information in flit
             t_flit->set_outport(outport);
         }
@@ -117,14 +109,45 @@ InputUnit::wakeup()
                 assert(virtualChannels[vc].get_state() == IDLE_);
                 set_vc_active(vc, curTick());
 
-                // Route computation for this vc
-                int outport = m_router->route_compute(t_flit->get_route(),
-                    m_id, m_direction);
+                EspaceAlgorithm espace_algorithm = (EspaceAlgorithm) m_router ->
+                                                   get_net_ptr()->getEspaceAlgorithm();
+                
+                if (espace_algorithm == SIMPLE_) {
+                    // First order
+                    int outport = m_router->route_compute(t_flit->get_route(),
+                        m_id, m_direction);
+                    int espace_outport = m_router->route_compute(t_flit->get_route(),
+                        m_id, m_direction, true);
+                    grant_outport(vc, outport);
 
-                // Update output port in VC
-                // All flits in this packet will use this output port
-                // The output port field in the flit is updated after it wins SA
-                grant_outport(vc, outport);
+                    t_flit->set_common_outport(outport);
+                    t_flit->set_espace_outport(espace_outport);
+
+                    // Check if we should only use espace vc
+                    if (t_flit->get_state() == 1){
+                        grant_outport(vc, espace_outport);
+                    }
+
+                }
+                else if (espace_algorithm == OBSERVE_) {
+                    auto outports = m_router->route_compute_all(t_flit->get_route(),
+                        m_id, m_direction);
+                    
+                    t_flit->clear_possible_outport();
+                    for(auto it: outports) {
+                        t_flit->insert_port(it);
+                    }
+                }
+                else {
+                    // Route computation for this vc
+                    int outport = m_router->route_compute(t_flit->get_route(),
+                        m_id, m_direction);
+
+                    // Update output port in VC
+                    // All flits in this packet will use this output port
+                    // The output port field in the flit is updated after it wins SA
+                    grant_outport(vc, outport);
+                }
 
             } else {
                 assert(virtualChannels[vc].get_state() == ACTIVE_);

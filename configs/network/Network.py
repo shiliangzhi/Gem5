@@ -1,3 +1,6 @@
+
++-.3
+
 # Copyright (c) 2016 Georgia Institute of Technology
 # All rights reserved.
 #
@@ -105,10 +108,22 @@ def define_options(parser):
             3: Ring
             4: Torus2DD
             5: Torus3DD
-            6: Torus3D1
-            7: Torus3D2
-            8: Torus2D1
-            9: Torus2D2""",
+            6: ShortXY(For torus 2D)
+            7: ShortXYZ(For torus 3D)
+            8: Torus2DRandom
+            9: Torus3DRandom
+            """,
+    )
+    parser.add_argument(
+        "--espace-algorithm",
+        action="store",
+        type=int,
+        default=0,
+        help="""Espace VC algorithm.
+        0: Not espace vc.
+        1: Have espace, simple algorithm(If not free for all common vc, 
+        switch to esapce vc)
+        2: observe"""
     )
     parser.add_argument(
         "--network-fault-model",
@@ -189,6 +204,7 @@ def init_network(options, network, InterfaceClass):
         network.routing_algorithm = options.routing_algorithm
         network.garnet_deadlock_threshold = options.garnet_deadlock_threshold
         network.wormhole = options.wormhole
+        network.espace_algorithm = options.espace_algorithm
 
         # Create Bridges and connect them to the corresponding links
         for intLink in network.int_links:
