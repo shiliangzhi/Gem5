@@ -65,6 +65,7 @@ class flit
     Tick get_time() { return m_time; }
     int get_vnet() { return m_vnet; }
     int get_vc() { return m_vc; }
+    int get_must_vc() { return m_must_vc; }
     int get_common_outport() {return m_common_outport;}
     int get_espace_outport() {return m_espace_outport;}
     int get_state() {return m_state;}
@@ -78,6 +79,7 @@ class flit
     void set_outport(int port) { m_outport = port; }
     void set_time(Tick time) { m_time = time; }
     void set_vc(int vc) { m_vc = vc; }
+    void set_must_vc(int vc) { m_must_vc = vc; }
     void set_route(RouteInfo route) { m_route = route; }
     void set_src_delay(Tick delay) { src_delay = delay; }
     void set_dequeue_time(Tick time) { m_dequeue_time = time; }
@@ -134,6 +136,7 @@ class flit
 
     int m_state; // 0: in common vc, 1: in espace vc
     int m_common_outport, m_espace_outport, num_escape_vc;
+    int m_must_vc;
 
     std::vector<int> possible_port;
 

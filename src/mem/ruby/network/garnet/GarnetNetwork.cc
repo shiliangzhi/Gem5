@@ -128,7 +128,7 @@ GarnetNetwork::GarnetNetwork(const Params &p)
     inform("Garnet version %s\n", garnetVersion);
 }
 
-void 
+void
 GarnetNetwork::observe_fail(int result)
 {
     observe_sum -= observe_list[observe_head];

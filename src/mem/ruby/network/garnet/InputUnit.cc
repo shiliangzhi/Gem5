@@ -138,7 +138,7 @@ InputUnit::wakeup()
                         t_flit->insert_port(it);
                     }
                 }
-                else if (espace_algorithm == COMBAIN_){
+                else if (espace_algorithm == COMBAIN_) {
                     auto outports = m_router->route_compute_all(t_flit->get_route(),
                         m_id, m_direction);
                     int espace_outport = m_router->route_compute(t_flit->get_route(),
@@ -150,6 +150,15 @@ InputUnit::wakeup()
                     for(auto it: outports) {
                         t_flit->insert_port(it);
                     }
+                }
+                else if (espace_algorithm == DFS_) {
+                    int outport = m_router->route_compute(t_flit->get_route(),
+                        m_id, m_direction);
+                    int use_vc = m_router->route_compute_vc(t_flit->get_route(),
+                        m_id, m_direction);
+
+                    grant_outport(vc, outport);
+                    t_flit->set_must_vc(use_vc);
                 }
                 else {
                     // Route computation for this vc

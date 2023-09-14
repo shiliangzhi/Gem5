@@ -293,6 +293,28 @@ SwitchAllocator::arbitrate_inports()
                         m_router->get_net_ptr()->observe_fail(1);
                     }
                 }
+                else if (espace_algorithm == DFS_) {
+                    flit* t_flit = input_unit->peekTopFlit(invc);
+                    int outport = input_unit->get_outport(invc);
+                    int outvc = input_unit->get_outvc(invc);
+                    int must_vc = t_flit->get_must_vc();
+
+                    // check if the flit in this InputVC is allowed to be sent
+                    // send_allowed conditions described in that function.
+                    bool make_request =
+                        send_allowed(inport, invc, outport, outvc, /*vc_check=*/2, /*must_vc=*/must_vc);
+
+                    if (make_request) {
+                        m_input_arbiter_activity++;
+                        m_port_requests[inport] = outport;
+                        m_vc_winners[inport] = invc;
+                        t_flit->set_num_escape_vc(m_router->get_net_ptr()->getNumberEscapeVC());
+                        m_router->get_net_ptr()->observe_fail(0);
+
+                        break; // got one vc winner for this port
+                    }
+                    m_router->get_net_ptr()->observe_fail(1);
+                }
                 else {
                     flit* t_flit = input_unit->peekTopFlit(invc);
                     int outport = input_unit->get_outport(invc);
@@ -376,6 +398,10 @@ SwitchAllocator::arbitrate_outports()
                         else {
                             outvc = vc_allocate(outport, inport, invc, /*vc_check=*/-1, /*vc_num=*/t_flit->get_num_escape_vc());
                         }
+                    }
+                    else if(espace_algorithm == DFS_) {
+                        flit* t_flit = input_unit->peekTopFlit(invc);
+                        outvc = vc_allocate(outport, inport, invc, /*vc_check=*/2, /*vc_num=*/0, /*must_vc=*/t_flit->get_must_vc());
                     }
                     else {
                         // VC Allocation - select any free VC from outport
@@ -493,7 +519,7 @@ SwitchAllocator::arbitrate_outports()
  */
 
 bool
-SwitchAllocator::send_allowed(int inport, int invc, int outport, int outvc, int vc_check)
+SwitchAllocator::send_allowed(int inport, int invc, int outport, int outvc, int vc_check, int must_vc)
 {
     // Check if outvc needed
     // Check if credit needed (for multi-flit packet)
@@ -516,7 +542,7 @@ SwitchAllocator::send_allowed(int inport, int invc, int outport, int outvc, int 
                 has_credit = true;
             }
         }
-        else if (output_unit->has_free_vc(vnet, vc_check)) {
+        else if (output_unit->has_free_vc(vnet, vc_check, must_vc)) {
 
             has_outvc = true;
 
@@ -558,7 +584,7 @@ SwitchAllocator::send_allowed(int inport, int invc, int outport, int outvc, int 
 
 // Assign a free VC to the winner of the output port.
 int
-SwitchAllocator::vc_allocate(int outport, int inport, int invc, int vc_check, int num_vc)
+SwitchAllocator::vc_allocate(int outport, int inport, int invc, int vc_check, int num_vc, int must_vc)
 {
     if (m_use_wormhole) {
         // If use wormhole, we just need to allocate vc for flit
@@ -570,7 +596,7 @@ SwitchAllocator::vc_allocate(int outport, int inport, int invc, int vc_check, in
     else {
         // Select a free VC from the output port
         int outvc =
-            m_router->getOutputUnit(outport)->select_free_vc(get_vnet(invc), vc_check, num_vc);
+            m_router->getOutputUnit(outport)->select_free_vc(get_vnet(invc), vc_check, num_vc, must_vc);
 
         // has to get a valid VC since it checked before performing SA
         assert(outvc != -1);

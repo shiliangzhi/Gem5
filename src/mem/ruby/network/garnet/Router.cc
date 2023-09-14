@@ -164,6 +164,12 @@ Router::route_compute(RouteInfo route, int inport, PortDirection inport_dirn, bo
     return routingUnit.outportCompute(route, inport, inport_dirn, get_espace);
 }
 
+int
+Router::route_compute_vc(RouteInfo route, int inport, PortDirection inport_dirn)
+{
+    return routingUnit.outportComputeVC(route, inport, inport_dirn);
+}
+
 std::vector<int>
 Router::route_compute_all(RouteInfo route, int inport, PortDirection inport_dirn)
 {

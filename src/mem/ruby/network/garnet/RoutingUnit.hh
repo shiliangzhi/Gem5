@@ -57,6 +57,9 @@ class RoutingUnit
                       int inport,
                       PortDirection inport_dirn,
                       bool get_espace=false);
+    int outportComputeVC(RouteInfo route,
+                        int inport,
+                        PortDirection inport_dirn);
     std::vector<int> outportComputeAll(RouteInfo route, int inport,
                                        PortDirection inport_dirn);
 
@@ -112,6 +115,14 @@ class RoutingUnit
     std::vector<int> outportAll3D(RouteInfo route,
                                   int inport,
                                   PortDirection inport_dirn);
+    
+    int computeVC2D(RouteInfo route,
+                    int inport,
+                    PortDirection inport_dirn);
+    
+    int computeVC3D(RouteInfo route,
+                    int inport,
+                    PortDirection inport_dirn);
 
     // Returns true if vnet is present in the vector
     // of vnets or if the vector supports all vnets.

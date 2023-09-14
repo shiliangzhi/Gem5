@@ -190,6 +190,27 @@ RoutingUnit::outportComputeAll(RouteInfo route, int inport,
     }
 }
 
+int
+RoutingUnit::outportComputeVC(RouteInfo route, int inport,
+                              PortDirection inport_dirn)
+{
+    int vc = -1;
+    if (route.dest_router == m_router->get_id()) {
+        return -1;
+    }
+    RoutingAlgorithm routing_algorithm =
+        (RoutingAlgorithm) m_router->get_net_ptr()->getRoutingAlgorithm();
+
+    switch (routing_algorithm) {
+        case ShortXY:
+            vc = computeVC2D(route, inport, inport_dirn); break;
+        case ShortXYZ:
+            vc = computeVC3D(route, inport, inport_dirn); break;
+        default: break;
+    }
+    return vc;
+}
+
 // outportCompute() is called by the InputUnit
 // It calls the routing table by default.
 // A template for adaptive topology-specific routing algorithm
@@ -715,6 +736,115 @@ RoutingUnit::outportAll3D(RouteInfo route,
     return outports;
 }
 
+int 
+RoutingUnit::computeVC2D(RouteInfo route,
+                         int inport,
+                         PortDirection inport_dirn)
+{
+    int my_id = m_router->get_id();
+    int dest_id = route.dest_router;
+
+    int x_length = m_router->get_net_ptr()->getXLength();
+    int y_length = m_router->get_net_ptr()->getYLength();
+
+
+    int my_x = my_id % x_length;
+    int my_y = my_id / x_length;
+
+    int dest_x = dest_id % x_length;
+    int dest_y = dest_id / x_length;
+
+    if (dest_x != my_x){
+        int left_distance = (my_x - dest_x + x_length) % x_length;
+        if (left_distance * 2 <= x_length) {
+            if(dest_x < my_x) return 0;
+            else if (dest_x == x_length - 1) return -1;
+            else return 1;
+        }
+        else {
+            if(dest_x > my_x) return 0;
+            else if (dest_x == 0) return -1;
+            else return 1;
+        }
+    }
+
+    if (dest_y != my_y) {
+        int left_distance = (my_y - dest_y + y_length) % y_length;
+        if (left_distance * 2 <= y_length) {
+            if(dest_y < my_y) return 0;
+            else if (dest_y == y_length - 1) return -1;
+            else return 1;
+        }
+        else {
+            if(dest_y > my_y) return 0;
+            else if(dest_y == 0) return -1;
+            else return 1;
+        }
+    }
+}
+
+int 
+RoutingUnit::computeVC3D(RouteInfo route,
+                         int inport,
+                         PortDirection inport_dirn)
+{
+    int my_id = m_router->get_id();
+    int dest_id = route.dest_router;
+
+    int x_length = m_router->get_net_ptr()->getXLength();
+    int y_length = m_router->get_net_ptr()->getYLength();
+    int z_length = m_router->get_net_ptr()->getZLength();
+
+    int my_x = my_id % x_length;
+    int my_y = (my_id / x_length) % y_length;
+    int my_z = my_id / (x_length * y_length);
+
+    int dest_x = dest_id % x_length;
+    int dest_y = (dest_id / x_length) % y_length;
+    int dest_z = dest_id / (x_length * y_length);
+
+    if (dest_x != my_x){
+        int left_distance = (my_x - dest_x + x_length) % x_length;
+        if (left_distance * 2 <= x_length) {
+            if(dest_x < my_x) return 0;
+            else if (dest_x == x_length - 1) return -1;
+            else return 1;
+        }
+        else {
+            if(dest_x > my_x) return 0;
+            else if (dest_x == 0) return -1;
+            else return 1;
+        }
+    }
+
+    if (dest_y != my_y) {
+        int left_distance = (my_y - dest_y + y_length) % y_length;
+        if (left_distance * 2 <= y_length) {
+            if(dest_y < my_y) return 0;
+            else if (dest_y == y_length - 1) return -1;
+            else return 1;
+        }
+        else {
+            if(dest_y > my_y) return 0;
+            else if (dest_y == 0) return -1;
+            else return 1;
+        }
+    }
+
+    if (dest_z != my_z) {
+        int left_distance = (my_z - dest_z + z_length) % z_length;
+        if (left_distance * 2 <= z_length) {
+            if(dest_z < my_z) return 0;
+            else if (dest_z == z_length - 1) return -1;
+            else return 1;
+        }
+        else {
+            if(dest_z > my_z) return 0;
+            else if (dest_z == 0) return -1;
+            else return 1;
+        }
+    }
+}
 
 } // namespace garnet
 } // namespace ruby
