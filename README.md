@@ -8,8 +8,8 @@ New topologies:
    - 2D-Torus
    - 3D-Torus
 New routing-algorithms:
-   - Deadlock free algorithm on Torus (Our algorithm)
-   - Deadlock free algorithm on Torus (Dally's paper)
+   - Deterministic deadlock free algorithm on Torus (Our algorithm)
+   - Deterministic deadlock free algorithm on Torus (Dally's paper)
    - Shortest Path algorithm
    - Random Shortest Path algorithm
    - Multi-Selectable Shortest Path algorithm
@@ -24,9 +24,9 @@ In `another` branch, you can run:
 
 ```
 # MeshXY
+./build/NULL/gem5.opt configs/example/garnet_synth_traffic.py --network=garnet --vcs-per-vnet=4 --num-cpus=64 --num-dirs=64 --topology=Mesh_XY --mesh-rows=8 --inj-vnet=0 --synthetic={} --sim-cycles=20000 --injectionrate={}
 
-
-# Deadlock free algorithm on Torus (Our algorithm)
+# Deterministic deadlock free algorithm on Torus (Our algorithm)
 ./build/NULL/gem5.opt configs/example/garnet_synth_traffic.py --network=garnet --vcs-per-vnet=4 --num-cpus=64 --num-dirs=64 --topology=Torus2D --torus-cols=8 --mesh-rows=8 --routing-algorithm=4 --inj-vnet=0 --synthetic={} --sim-cycles=20000 --injectionrate={}
 
 # Shortest Path (SP) algorithm
@@ -41,7 +41,7 @@ In `another` branch, you can run:
 
 In `main` branch, you can run:
 ```
-# Deadlock free algorithm on Torus (Dally's paper)
+# Deterministic deadlock free algorithm on Torus (Dally's paper)
 ./build/NULL/gem5.opt configs/example/garnet_synth_traffic.py --network=garnet --vcs-per-vnet=4 --num-cpus=64 --num-dirs=64 --topology=Torus2D --mesh-rows=8 --routing-algorithm=6 --inj-vnet=0 --synthetic={} --sim-cycles=20000 --injectionrate={} --espace-algorithm=4
 
 # MSSP with one espace VC
