@@ -50,6 +50,17 @@ In `main` branch, you can run:
 # MSSP with Adaptive Escape Virtual Channel (AEVC) algorithm
 ./build/NULL/gem5.opt configs/example/garnet_synth_traffic.py --network=garnet --vcs-per-vnet=4 --num-cpus=64 --num-dirs=64 --topology=Torus2D --mesh-rows=8 --routing-algorithm=6 --inj-vnet=0 --synthetic={} --sim-cycles=20000 --injectionrate={} --espace-algorithm=3 --aevc
 ```
+#### For data prepare
+
+Here we prepare the way to get `latency-injectionrate` data for MSSP with AEVC algorithm in 2D-Trous topology.  In `main` branch, run
+
+```
+python ./configs/example/plot_analyze.py
+```
+
+You can get the latency data in `network_stats.txt`.
+
+By changing the `cmd` in `plot_analyze.py`, you can get the latency data for other algorithm and other synthetic.
 
 #### Gem5 Readme
 
