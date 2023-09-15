@@ -52,6 +52,73 @@ In `main` branch, you can run:
 ```
 #### For data prepare
 
+##### Experiment 2
+
+Here we prepare the code for getting `latency-injectionrate` data in `uniform_random` synthetic for `Deterministic deadlock free algorithm on Torus (Our algorithm)`. You should run this code in `another` branch.
+
+By changing the instruction in the code, we can get other data.
+
+```python
+import os
+import numpy as np
+import matplotlib.pyplot as plt
+
+synthetic = "uniform_random"
+begin = 0.1
+end = 0.4
+
+inj_rate_list = np.linspace(begin, end, 60)
+
+cut = True
+cut_threshold = 50
+
+os.system("echo > latency_{}.txt".format(synthetic))
+for inj_rate in inj_rate_list:
+    os.system(
+        "echo inject rate: {} >> latency_{}.txt".format(inj_rate, synthetic)
+    )
+    os.system(
+        "./build/NULL/gem5.opt configs/example/garnet_synth_traffic.py --network=garnet --vcs-per-vnet=4 --num-cpus=64 --num-dirs=64 --topology=Torus2D --torus-cols=8 --mesh-rows=8 --routing-algorithm=4 --inj-vnet=0 --synthetic={} --sim-cycles=20000 --injectionrate={}".format(
+            synthetic, inj_rate
+        )
+    )
+    os.system(
+        "grep 'average_packet_latency' m5out/stats.txt | sed 's/system.ruby.network.average_packet_latency\s*/average_packet_latency = /' >> latency_{}.txt".format(
+            synthetic
+        )
+    )
+
+injection_rate_list = []
+torus_latency_1 = []
+
+test_txt = open("latency_{}.txt".format(synthetic), "r")
+lines = test_txt.readlines()
+test_txt.close()
+
+for line in lines:
+    if "inject rate" in line:
+        injection_rate_list.append(float(line.split()[2]))
+    elif "average_packet_latency" in line:
+        if cut and float(line.split()[2]) > cut_threshold:
+            torus_latency_1.append(cut_threshold)
+        else:
+            torus_latency_1.append(float(line.split()[2]))
+
+plt.figure()
+plt.title("Average Packet Latency vs. Injection Rate")
+plt.plot(
+    injection_rate_list,
+    torus_latency_1,
+    label="Deadlock-Free",
+    color="blue",
+    linestyle="--",
+)
+plt.xlabel("Injection Rate")
+plt.ylabel("Average Packet Latency")
+```
+
+##### Experiment 4
+
 Here we prepare the way to get `latency-injectionrate` data for MSSP with AEVC algorithm in 2D-Trous topology.  In `main` branch, run
 
 ```
